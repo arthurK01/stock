@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朋億 (6613) 深度研究報告｜2026/06/10</title>
+<style>
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1c2430; --ink-2:#4a5568; --ink-3:#8b95a5;
+  --line:#e4e8ee; --accent:#0f5ec4; --accent-soft:#e8f0fc;
+  --up:#c0392b; --up-soft:#fdeeec; --down:#1e7e4d; --down-soft:#e9f6ef;
+  --warn:#b7791f; --warn-soft:#fdf6e3; --key:#6b46c1; --key-soft:#f3eefc;
+  --th-bg:#f0f3f7; --row-alt:#fafbfc; --code-bg:#eef1f5;
+  --shadow:0 1px 3px rgba(16,24,40,.08),0 8px 24px rgba(16,24,40,.05);
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12161d; --paper:#1a202b; --ink:#e6e9ef; --ink-2:#aeb6c4; --ink-3:#727c8e;
+    --line:#2b3442; --accent:#5b9cf0; --accent-soft:#1c2c45;
+    --up:#e7705f; --up-soft:#3a221f; --down:#4fbf85; --down-soft:#173326;
+    --warn:#d9a441; --warn-soft:#332a14; --key:#a78bdb; --key-soft:#291f3d;
+    --th-bg:#222a37; --row-alt:#1e2530; --code-bg:#242c39;
+    --shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  font-size:16px; line-height:1.75;
+  -webkit-text-size-adjust:100%;
+}
+/* ===== 整體版型：桌機雙欄 / 行動單欄 ===== */
+.layout{display:block; max-width:1280px; margin:0 auto; padding:0 14px 80px}
+main{min-width:0}
+nav.toc{display:none}
+@media (min-width:1024px){
+  .layout{display:grid; grid-template-columns:248px minmax(0,1fr); gap:28px; padding:0 24px 100px}
+  nav.toc{
+    display:block; position:sticky; top:20px; align-self:start;
+    max-height:calc(100vh - 40px); overflow-y:auto;
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 6px; box-shadow:var(--shadow); margin-top:24px;
+  }
+  nav.toc .toc-title{font-size:.8rem; letter-spacing:.12em; color:var(--ink-3); padding:2px 12px 8px; font-weight:700}
+  nav.toc a{
+    display:block; padding:5px 12px; font-size:.85rem; color:var(--ink-2);
+    text-decoration:none; border-left:3px solid transparent; border-radius:0 8px 8px 0;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  nav.toc a:hover{background:var(--accent-soft); color:var(--accent)}
+  nav.toc a.active{border-left-color:var(--accent); color:var(--accent); background:var(--accent-soft); font-weight:700}
+}
+/* ===== 行動版頂部摺疊目錄 ===== */
+.m-nav{position:sticky; top:0; z-index:50; background:var(--paper); border-bottom:1px solid var(--line); box-shadow:var(--shadow); margin:0 -14px}
+.m-nav summary{
+  list-style:none; cursor:pointer; padding:11px 16px; font-weight:700; font-size:.95rem;
+  display:flex; align-items:center; gap:8px; color:var(--accent);
+}
+.m-nav summary::-webkit-details-marker{display:none}
+.m-nav summary::before{content:"☰"; font-size:1rem}
+.m-nav[open] summary::before{content:"✕"}
+.m-nav .m-links{max-height:62vh; overflow-y:auto; border-top:1px solid var(--line); padding:6px 0}
+.m-nav .m-links a{display:block; padding:9px 20px; color:var(--ink-2); text-decoration:none; font-size:.9rem; border-bottom:1px dashed var(--line)}
+.m-nav .m-links a:active{background:var(--accent-soft)}
+@media (min-width:1024px){ .m-nav{display:none} }
+/* ===== 報告標頭 ===== */
+header.hero{
+  background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:26px 22px 20px; margin-top:18px;
+}
+header.hero h1{margin:0 0 4px; font-size:1.55rem; line-height:1.35}
+header.hero .sub{color:var(--ink-3); font-size:.85rem; margin-bottom:16px}
+.hero-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+@media (min-width:700px){ .hero-grid{grid-template-columns:repeat(4,1fr)} header.hero h1{font-size:1.9rem} }
+.stat{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 14px}
+.stat .k{font-size:.75rem; color:var(--ink-3)}
+.stat .v{font-size:1.15rem; font-weight:800}
+.stat .v small{font-size:.72rem; font-weight:400; color:var(--ink-3)}
+.badge{display:inline-block; padding:2px 12px; border-radius:999px; font-weight:800; font-size:.95rem; background:var(--up-soft); color:var(--up); border:1px solid currentColor}
+.hero-note{margin-top:12px; font-size:.85rem; color:var(--ink-2); background:var(--warn-soft); border-left:4px solid var(--warn); padding:8px 12px; border-radius:0 8px 8px 0}
+.chart{margin:18px 0 0}
+.chart img{width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:#fff}
+.chart figcaption{font-size:.78rem; color:var(--ink-3); text-align:center; margin-top:4px}
+/* ===== 章節卡片 ===== */
+section.card{
+  background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:22px 22px 16px; margin-top:22px;
+  scroll-margin-top:64px;
+}
+@media (min-width:1024px){ section.card{padding:28px 30px 20px; scroll-margin-top:24px} }
+h2{font-size:1.25rem; margin:0 0 14px; padding-bottom:10px; border-bottom:2px solid var(--accent); display:flex; gap:10px; align-items:baseline}
+h2 .no{color:var(--accent); font-weight:900}
+h3{font-size:1.02rem; margin:22px 0 8px; color:var(--accent)}
+h4{font-size:.95rem; margin:18px 0 6px}
+p{margin:8px 0}
+ul,ol{padding-left:1.3em; margin:8px 0}
+li{margin:5px 0}
+strong{font-weight:700}
+.hl{background:linear-gradient(transparent 62%, var(--accent-soft) 62%); font-weight:800}
+/* ===== 表格：桌機完整呈現、行動橫向滑動 ===== */
+.tw{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:12px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:.88rem; min-width:560px}
+.tw.narrow table{min-width:420px}
+.tw.wide table{min-width:760px}
+th,td{padding:8px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; white-space:nowrap}
+td.wrap, th.wrap{white-space:normal; min-width:200px}
+thead th{background:var(--th-bg); font-weight:700; position:sticky; top:0}
+tbody tr:nth-child(even){background:var(--row-alt)}
+tbody tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums}
+.pos{color:var(--up); font-weight:700}
+.neg{color:var(--down); font-weight:700}
+@media (max-width:1023px){
+  .tw{position:relative}
+  .tw::after{
+    content:"⟵ 可左右滑動"; display:block; text-align:right;
+    font-size:.7rem; color:var(--ink-3); padding:4px 10px; background:var(--paper);
+    border-top:1px dashed var(--line);
+  }
+  table{font-size:.82rem}
+  th,td{padding:7px 10px}
+}
+/* ===== 提示框 ===== */
+.callout{border-left:4px solid; border-radius:0 10px 10px 0; padding:12px 16px; margin:14px 0; font-size:.92rem}
+.callout p{margin:6px 0}
+.callout.warn{background:var(--warn-soft); border-color:var(--warn)}
+.callout.info{background:var(--accent-soft); border-color:var(--accent)}
+.callout.key{background:var(--key-soft); border-color:var(--key)}
+.callout.good{background:var(--down-soft); border-color:var(--down)}
+.callout .ct{font-weight:800; display:block; margin-bottom:4px}
+blockquote.src{
+  margin:10px 0; padding:10px 16px; background:var(--bg); border-left:3px solid var(--ink-3);
+  border-radius:0 8px 8px 0; color:var(--ink-2); font-size:.88rem;
+}
+blockquote.src cite{display:block; font-style:normal; font-size:.78rem; color:var(--ink-3); margin-top:4px}
+/* ===== 其他元件 ===== */
+.flow{background:var(--code-bg); border-radius:10px; padding:12px 16px; font-size:.85rem; overflow-x:auto; white-space:nowrap; font-family:ui-monospace,Consolas,monospace}
+.stars{color:#d69e2e; letter-spacing:2px}
+.checklist{list-style:none; padding-left:0}
+.checklist li{padding-left:1.9em; position:relative}
+.checklist li::before{position:absolute; left:0; top:0}
+.checklist li.done::before{content:"✅"}
+.checklist li.todo::before{content:"⏳"}
+.checklist li.warn::before{content:"⚠️"}
+.tag{display:inline-block; font-size:.72rem; padding:1px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-weight:700; vertical-align:middle}
+footer.fin{margin-top:30px; text-align:center; color:var(--ink-3); font-size:.78rem; line-height:1.9}
+#topBtn{
+  position:fixed; right:16px; bottom:18px; z-index:60; width:42px; height:42px; border-radius:50%;
+  border:1px solid var(--line); background:var(--paper); color:var(--accent); font-size:1.1rem;
+  box-shadow:var(--shadow); cursor:pointer; opacity:0; pointer-events:none; transition:opacity .25s;
+}
+#topBtn.show{opacity:.92; pointer-events:auto}
+@media print{
+  .m-nav,nav.toc,#topBtn{display:none!important}
+  body{background:#fff}
+  section.card{box-shadow:none; border-color:#ccc; break-inside:avoid-page}
+}
+</style>
+</head>
+<body>
+
+<details class="m-nav" id="mnav">
+  <summary>朋億 (6613) 研究報告｜章節目錄</summary>
+  <div class="m-links" id="mlinks"></div>
+</details>
+
+<div class="layout">
+
+<nav class="toc" id="toc" aria-label="章節目錄">
+  <div class="toc-title">目錄 CONTENTS</div>
+</nav>
+
+<main>
+
+<header class="hero">
+  <h1>朋億 (6613) 深度研究報告</h1>
+  <div class="sub">6613.TWO（上櫃）｜半導體廠務系統｜報告日期 2026年6月10日</div>
+  <div class="hero-grid">
+    <div class="stat"><div class="k">現價（2026/06/10）</div><div class="v">266.0 <small>元・TPEx MIS</small></div></div>
+    <div class="stat"><div class="k">評等</div><div class="v"><span class="badge">買進 Buy</span></div></div>
+    <div class="stat"><div class="k">中性目標（2026E）</div><div class="v">302 <small>元・PE 17x</small></div></div>
+    <div class="stat"><div class="k">樂觀目標（2027E・中信）</div><div class="v">400 <small>元・12-18 個月</small></div></div>
+  </div>
+  <div class="hero-note">⚠️ 現價追價風報比不佳（中性目標對季線停損僅 1.2:1），建議回檔佈局——詳見第 1 章風報比分析。</div>
+  <figure class="chart">
+    <img src="trend_chart.png" alt="近6個月股價走勢圖">
+    <figcaption>近 6 個月股價走勢圖</figcaption>
+  </figure>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="card" id="s1" data-title="1. 投資觀點總結">
+<h2><span class="no">1</span>投資觀點總結 <small>Investment Summary</small></h2>
+
+<h3>核心投資論點</h3>
+<ol>
+  <li><strong>🟢 在手訂單創歷史紀錄（核彈級前瞻指標）</strong>：4M26（4 月）在手訂單突破 <span class="hl">130 億元</span>，中信預期 2Q26 往 <strong>150 億元</strong>邁進。對照歷史軌跡：2024 年高峰約 100 億、4Q25 僅 60 幾億、1Q26 躍升至 103 億——已超越歷史紀錄。主要來自美系記憶體客戶兩座新廠、中國新接兩廠專案、台系 OSAT 長交期訂單。訂單轉換為營收約需 1 季，奠定 2H26 起逐季高成長基礎。</li>
+  <li><strong>1Q26 財報優於預期</strong>：營收 23.42 億（YoY +8.95%）、毛利率 32.09%、EPS <strong>3.84 元</strong>，優於中信 2 月報告預估的 3.2 元。惟須注意：超預期部分主因 3 月多項專案結案一次性挹注，不宜直接線性外推。</li>
+  <li><strong>營收動能自 2Q26 起顯著增強</strong>：5 月營收 10.83 億（YoY +81.7%），前 5 月累計 41.36 億（YoY +25.8%）。中信預估 2Q26 營收 27.7 億（QoQ +18%、YoY +35%），2H26 增速更勝 1H26，1Q26 即為全年谷底。</li>
+  <li><strong>2025 年谷底已確認</strong>：2025 全年營收 89.15 億（YoY -14.13%）、EPS 13.37 元（YoY -18.7%），優於年中時市場悲觀預估的 12.0-12.5 元。2026/2027 年中信預估 EPS 為 <strong>17.77 / 23.55 元</strong>。</li>
+  <li><strong>毛利率展望上修</strong>：AI 驅動廠務市場供不應求，廠商對新案具挑選彈性。中信將 2026/2027 年毛利率自 28.1%/28.6% 上修至 <strong>29.7%/30.3%</strong>。惟 2Q26 因中國案（毛利率較低）占比提升，毛利率預估降至 27.5%，為短期最大檢驗點。</li>
+  <li><strong>評價低估且有殖利率支撐</strong>：Forward PE 15.0x（2026E），低於廠務同業；2025 年度股息 10 元（現價殖利率約 3.8%），中信預估 2026 年度股息 13.3 元（約 5.0%），提供下檔保護。</li>
+  <li><strong>技術面多頭但短線過熱</strong>：現價 266 元站上月線（MA20 約 260）與季線（MA60 約 235），均線多頭排列。惟中信 6/10 報告基準價為 255 元，現價已較其上漲逾 4%，短線追價風險升高。</li>
+</ol>
+
+<h3>📊 風險報酬比分析 (Risk/Reward Analysis)</h3>
+
+<h4>價位架構（2026/06/10，現價 266.0 元）</h4>
+<div class="tw">
+<table>
+<thead><tr><th>指標</th><th>價位</th><th>計算依據</th><th class="wrap">說明</th></tr></thead>
+<tbody>
+<tr><td><strong>現價</strong></td><td class="num">266.0</td><td>TPEx MIS（2026/06/10）</td><td class="wrap">中信報告基準價 255</td></tr>
+<tr><td><strong>技術壓力</strong></td><td class="num">270</td><td>近期高點</td><td class="wrap">距現價僅 1.5%</td></tr>
+<tr><td><strong>技術支撐 1</strong></td><td class="num">260</td><td>月線（MA20）</td><td class="wrap">短期防守線</td></tr>
+<tr><td><strong>技術支撐 2</strong></td><td class="num">235</td><td>季線（MA60）</td><td class="wrap">中期支撐</td></tr>
+<tr><td><strong>目標價（中性）</strong></td><td class="num"><strong>302</strong></td><td>PE 17x × 2026E EPS 17.77</td><td class="wrap">本報告推估，12 個月視角</td></tr>
+<tr><td><strong>目標價（樂觀）</strong></td><td class="num"><strong>400</strong></td><td>PE 17x × 2027E EPS 23.55</td><td class="wrap">中信目標價，12-18 個月視角</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>風報比計算表</h4>
+<div class="tw wide">
+<table>
+<thead><tr><th class="wrap">目標 / 停損組合</th><th>上檔空間</th><th>下檔風險</th><th>風報比</th><th class="wrap">評註</th></tr></thead>
+<tbody>
+<tr><td class="wrap">中性 302 / 跌破月線 258</td><td class="num pos">+36 元（+13.5%）</td><td class="num neg">-8 元（-3.0%）</td><td>4.5:1</td><td class="wrap">停損極窄，被日常波動掃出機率高</td></tr>
+<tr><td class="wrap">中性 302 / 跌破季線 235</td><td class="num pos">+36 元（+13.5%）</td><td class="num neg">-31 元（-11.7%）</td><td><strong>1.2:1</strong></td><td class="wrap">波段視角下，現價進場吸引力不足</td></tr>
+<tr><td class="wrap">樂觀 400 / 跌破季線 235</td><td class="num pos">+134 元（+50.4%）</td><td class="num neg">-31 元（-11.7%）</td><td><strong>4.3:1</strong></td><td class="wrap">須 2027 年業績兌現，持有期 12-18 個月</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout warn">
+<span class="ct">⚠️ 方法論警示</span>
+以窄停損（如月線下方 8 元）搭配遠目標（400 元）可算出 16:1 以上的風報比，但這是數字幻覺——停損越貼近現價，風報比越漂亮，被洗出的機率也越高，兩者必須一起評估。目標價與停損的時間尺度也須匹配：400 元目標基於 2027 年業績，若搭配 3% 的短線停損，多數情況會在業績兌現前就被掃出場。
+</div>
+
+<div class="callout key">
+<span class="ct">📌 風報比結論</span>
+<ol>
+<li>若以 2026 年業績（中性目標 302）衡量，現價 266 的上檔僅 13.5%，對應季線停損的風報比僅 1.2:1，<strong>不支持現價重倉追價</strong>。</li>
+<li>若認同 2027 年成長路徑（中信目標 400），以季線為停損的風報比 4.3:1 屬合理，但前提是接受 12-18 個月持有期、期間可能的回撤、以及 2Q26 毛利率下滑的檢驗。</li>
+<li><strong>操作結論</strong>：現價僅適合輕倉試單；核心部位等回檔至 250-260（月線附近）佈局；跌破季線 235 停損或大幅減碼。</li>
+<li><strong>重算紀律</strong>：風報比對獲利率假設極為敏感（過往案例：毛利率僅下修 1.2 ppts，中性風報比即自 2.6:1 降至 1.9:1）。2Q26 財報公布後必須以新數據重算本表，不得沿用。</li>
+</ol>
+</div>
+
+<h4>進場策略建議表</h4>
+<div class="tw wide">
+<table>
+<thead><tr><th>策略</th><th>進場價</th><th>停損</th><th>目標</th><th class="wrap">風報比（以區間中值計）</th><th class="wrap">倉位建議</th></tr></thead>
+<tbody>
+<tr><td>動能試單型</td><td class="num">266-270</td><td class="num">258（跌破月線）</td><td class="num">302</td><td class="wrap">約 3.4（+34 / -10）</td><td class="wrap">輕倉，被掃出即等回檔</td></tr>
+<tr><td>回檔佈局型</td><td class="num">250-260</td><td class="num">235（跌破季線）</td><td class="num">302 / 400</td><td class="wrap">中性 2.4 / 樂觀 7.3</td><td class="wrap">核心部位</td></tr>
+<tr><td>強支撐加碼型</td><td class="num">235-240</td><td class="num">225</td><td class="num">302 / 400</td><td class="wrap">中性 4.9 / 樂觀 12.5</td><td class="wrap">跌至季線且基本面未變時加碼</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>賣出劇本（進場時預寫，之後只執行、不再重新決定）</h4>
+<div class="tw">
+<table>
+<thead><tr><th>類別</th><th class="wrap">觸發條件</th><th class="wrap">動作</th></tr></thead>
+<tbody>
+<tr><td>技術停損</td><td class="wrap">收盤跌破季線 235 元</td><td class="wrap">全數出場或減至底倉</td></tr>
+<tr><td>獲利率訊號</td><td class="wrap">2Q26 毛利率低於 26%（中信估 27.5%）</td><td class="wrap">減碼一半，重新檢驗「毛利率上修」敘事</td></tr>
+<tr><td>訂單訊號</td><td class="wrap">在手訂單停止上修或回落、中信下修 2027 年假設</td><td class="wrap">出場</td></tr>
+<tr><td>營收訊號</td><td class="wrap">2Q26 單季營收低於 25 億（預估 27.7 億，即 6 月須開出約 9.7 億以上）</td><td class="wrap">減碼並下調情境</td></tr>
+<tr><td>部位上限</td><td class="wrap">以「即使歸零也能冷靜檢討」的規模為限</td><td class="wrap">流通籌碼少、回檔劇烈，不宜重倉單押</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout info">
+<span class="ct">💡 參考點替換法</span>
+持有中每次檢視，強制自問：「若我現在手上是現金，會以今日價格買進這檔嗎？」答案若否，部位就不該留著——避免被買進成本綁架。
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="card" id="s2" data-title="2. 資料來源摘要">
+<h2><span class="no">2</span>資料來源摘要 <small>Data Sources Summary</small></h2>
+
+<h3>2.1 官方數據與新聞</h3>
+<blockquote class="src">「Q3 累計 EPS 10.14 元」<cite>TPEx 櫃買中心（2026/01/13 查詢）</cite></blockquote>
+<blockquote class="src">「合約負債 2025Q3 為 13.41 億元，較前季持平」<cite>MoneyDJ（歷史數據查詢）</cite></blockquote>
+<blockquote class="src">「朋億 12 月營收 10.83 億元，年減 9.35%，1-12 月達 89.15 億元」<cite>鉅亨網（2026/01/10）</cite></blockquote>
+<blockquote class="src">「朋億去年每股純益 17.1 元創新高，每股擬配息 9 元」<cite>經濟日報（2025/02/25）（註：與中信彙整之 2024 年度股息 11.90 元不一致，可能為初步擬議數，待查證）</cite></blockquote>
+<blockquote class="src">「朋億*今年營收挑戰新高」<cite>工商時報（2025/12/13）</cite></blockquote>
+
+<h3>2.2 投顧與外資報告專區</h3>
+<h4>📊 券商報告總覽表</h4>
+<div class="tw wide">
+<table>
+<thead><tr><th>日期</th><th>券商</th><th>評等</th><th>目標價</th><th>當時股價</th><th>2025E EPS</th><th>2026E EPS</th><th>2027E EPS</th></tr></thead>
+<tbody>
+<tr><td>2026/06/10</td><td>中信證券</td><td><strong>買進（B）</strong></td><td class="num"><strong>400</strong></td><td class="num">255</td><td class="num">13.37（實際）</td><td class="num"><strong>17.77</strong></td><td class="num"><strong>23.55</strong></td></tr>
+<tr><td>2026/02/24</td><td>中信證券</td><td>買進（B）</td><td class="num">265</td><td class="num">194</td><td class="num">13.42</td><td class="num">15.37</td><td class="num">19.06</td></tr>
+<tr><td>2025/11/24</td><td>中信證券</td><td>買進（B）</td><td class="num">235</td><td class="num">169</td><td class="num">13.88</td><td class="num">16.15</td><td class="num">18.40</td></tr>
+<tr><td>2025/08/22</td><td>中信證券</td><td>買進（B）</td><td class="num">245</td><td class="num">197</td><td class="num">11.89</td><td class="num">16.22</td><td class="num">-</td></tr>
+<tr><td>2025/07/14</td><td>中信證券</td><td>買進（B）首評</td><td class="num">225</td><td class="num">177.5</td><td class="num">12.03</td><td class="num">16.08</td><td class="num">-</td></tr>
+<tr><td>2025/09/04</td><td>凱基論壇</td><td>（公司簡報）</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+</tbody>
+</table>
+</div>
+
+<blockquote class="src">「1Q26 為全年谷底，2H26 增速更上層樓；在手訂單 4M26 突破 130 億元，2Q26 有望往 150 億元邁進；上修 2026/2027 年 EPS 至 17.77/23.55 元，目標價 400 元（2027 年 EPS × 17 倍 PER）」<cite>中信證券（2026/06/10）・買進（B）・目標價 400 元</cite></blockquote>
+<blockquote class="src">「記憶體大擴產潮受惠股，在手訂單突破百億（103 億，4Q25 僅 60 幾億）；惟訂單轉換為營收至少需 1 季」<cite>中信證券（2026/02/24）・買進（B）・目標價 265 元</cite></blockquote>
+<blockquote class="src">「2025F EPS 13.88 元；2026F 營收 110.52 億（+29.87% YoY），EPS 16.15 元」<cite>中信證券（2025/11/24）・買進（B）・目標價 235 元</cite></blockquote>
+<blockquote class="src">「高科技製程設備製造佔營收約 48%（20.07 億），水氣化系統整合服務約 46%；聖暉（5536）持股 55.52%；集團員工合計 928 人」<cite>凱基證券 2025Q3 投資論壇・公司簡報（2025/09/04）</cite></blockquote>
+
+<h3>2.3 觀點分歧表 (Divergence Table)</h3>
+<div class="callout warn">
+<span class="ct">⚠️ 資訊結構警示</span>
+公開研究僅中信證券一家持續覆蓋，缺乏真正的悲觀派對照組，「分歧」實為同一分析師的預估演進。單一資訊源的確認偏誤風險須自行對沖——本報告以「中信預估打折」作為保守情境。
+</div>
+<div class="tw wide">
+<table>
+<thead><tr><th>分析面向</th><th class="wrap">較樂觀觀點</th><th class="wrap">較保守觀點</th><th class="wrap">本報告判斷</th></tr></thead>
+<tbody>
+<tr><td><strong>2026E EPS</strong></td><td class="wrap">中信 6 月：17.77 元</td><td class="wrap">中信 2 月：15.37 元</td><td class="wrap">採 17.77 元為中性、15.5 元為保守情境</td></tr>
+<tr><td><strong>目標價</strong></td><td class="wrap">中信 6 月：400 元（2027E 基準）</td><td class="wrap">中信 2 月：265 元</td><td class="wrap">中性採 302 元（2026E × 17x），400 元視為樂觀</td></tr>
+<tr><td><strong>2Q26 毛利率</strong></td><td class="wrap">1Q26 實際 32.09%</td><td class="wrap">中信預估 2Q26 降至 27.5%</td><td class="wrap">採中信預估，8 月 Q2 財報為關鍵驗證點</td></tr>
+<tr><td><strong>在手訂單</strong></td><td class="wrap">4M26 已 130 億、往 150 億邁進</td><td class="wrap">訂單轉營收需 1 季以上，材料短缺恐遞延認列</td><td class="wrap">訂單真實性高（連 3 季上修），但認列節奏存在不確定性</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="card" id="s3" data-title="3. 財務數據分析">
+<h2><span class="no">3</span>財務數據分析 <small>Financial Data Analysis</small></h2>
+
+<h3>3.1 歷史財務趨勢表（資料來源：中信證券 2026/06/10 報告彙整）</h3>
+<div class="tw">
+<table>
+<thead><tr><th>年度</th><th>營收（億）</th><th>稅後淨利（億）</th><th>EPS（元，公告基本）</th><th>毛利率</th><th>營益率</th></tr></thead>
+<tbody>
+<tr><td>2022</td><td class="num">85.93</td><td class="num">7.97</td><td class="num">11.74</td><td class="num">22.37%</td><td class="num">13.76%</td></tr>
+<tr><td>2023</td><td class="num">91.40</td><td class="num">10.42</td><td class="num">14.95</td><td class="num">25.44%</td><td class="num">16.16%</td></tr>
+<tr><td>2024</td><td class="num">103.82</td><td class="num">12.79</td><td class="num"><strong>17.10</strong></td><td class="num">29.81%</td><td class="num">18.51%</td></tr>
+<tr><td>2025</td><td class="num">89.15</td><td class="num">10.40</td><td class="num"><strong>13.37</strong></td><td class="num"><strong>32.36%</strong></td><td class="num">19.02%</td></tr>
+<tr><td>2026 Q1</td><td class="num">23.42</td><td class="num">2.99</td><td class="num"><strong>3.84</strong></td><td class="num">32.09%</td><td class="num"><strong>20.16%</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout info">
+<span class="ct">📉 觀察</span>
+2025 年營收年減 14.13%，但毛利率逆勢升至 32.36%，主因小型工程擴充案件（毛利率較高）佔比增加。2026 年隨大型新建案放量，中信預估全年毛利率回落至 29.7%——<strong>營收成長與毛利率回落並存</strong>是 2026 年的正確基準預期，不應以 1Q26 的 32.09% 線性外推。
+</div>
+
+<h3>3.2 近期月營收</h3>
+<div class="tw wide">
+<table>
+<thead><tr><th>月份</th><th>狀態</th><th>金額（億）</th><th>MoM</th><th>YoY</th><th class="wrap">說明</th></tr></thead>
+<tbody>
+<tr><td>2026/01</td><td>✅ 已知</td><td class="num">6.41</td><td class="num neg">-40.8%</td><td class="num neg">-29.6%</td><td class="wrap">傳統淡季與專案進度空窗</td></tr>
+<tr><td>2026/02</td><td>✅ 已知</td><td class="num">6.31</td><td class="num neg">-1.6%</td><td class="num pos">+6.8%</td><td class="wrap">營收止穩回升</td></tr>
+<tr><td>2026/03</td><td>✅ 已知</td><td class="num">10.70</td><td class="num pos">+69.6%</td><td class="num pos">+65.2%</td><td class="wrap">多項台系與中系專案結案挹注，創同期新高</td></tr>
+<tr><td>2026/04</td><td>✅ 已知</td><td class="num">7.11</td><td class="num neg">-33.5%</td><td class="num pos">+30.8%</td><td class="wrap">專案空窗期，仍維持 YoY 雙位數增長</td></tr>
+<tr><td>2026/05</td><td>✅ 已知</td><td class="num">10.83</td><td class="num pos">+52.3%</td><td class="num pos">+81.7%</td><td class="wrap">美系記憶體與封測廠新專案動工，動能強勁</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout good">
+✅ 營收數據已透過櫃買中心與官方公告驗證（最後更新：2026/06/10）。中信 6/10 報告亦以「5M26 開出 10.8 億元營收」作為 2Q26 加速的佐證。
+</div>
+
+<h3>3.3 近期營收總結</h3>
+<div class="tw narrow">
+<table>
+<thead><tr><th>項目</th><th>金額/數據</th><th>YoY</th></tr></thead>
+<tbody>
+<tr><td>2026 前 5 月累計營收</td><td class="num"><strong>41.36 億</strong></td><td class="num pos">+25.8%</td></tr>
+<tr><td>2026 Q1 累計營收</td><td class="num">23.42 億</td><td class="num pos">+8.95%</td></tr>
+<tr><td>2026 5 月營收</td><td class="num">10.83 億</td><td class="num pos">+81.7%</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout info">
+<span class="ct">💡 亮點</span>
+前 5 月累計年增 25.8%，且月營收波動軌跡（1 月谷底、3 月結案高峰、5 月新案動工放量）與中信「1Q26 為全年谷底、2Q26 起逐季成長」的劇本吻合，初步驗證 2026 年高成長判斷。
+</div>
+
+<h3>3.4 2026 Q1 實際財報與季度展望</h3>
+<h4>1Q26 實際數據（已公布）</h4>
+<div class="tw">
+<table>
+<thead><tr><th>項目</th><th>實際數據</th><th class="wrap">對照</th></tr></thead>
+<tbody>
+<tr><td>營收</td><td class="num">23.42 億</td><td class="wrap">YoY +8.95%，優於中信 2 月預估的 21.5 億</td></tr>
+<tr><td>毛利率</td><td class="num"><strong>32.09%</strong></td><td class="wrap">優於預估的 31.9%，主因 3 月專案結案挹注</td></tr>
+<tr><td>營益率</td><td class="num">20.16%</td><td class="wrap">較 4Q25（13.62%，含信用減損提列）大幅回升</td></tr>
+<tr><td>稅後淨利</td><td class="num">2.99 億</td><td class="wrap">YoY +28.81%</td></tr>
+<tr><td>EPS</td><td class="num"><strong>3.84 元</strong></td><td class="wrap">優於中信預估 3.2 元，創歷年同期新高</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>中信季度預估（2026/06/10）</h4>
+<div class="tw">
+<table>
+<thead><tr><th>季度</th><th>營收（億）</th><th>QoQ</th><th>毛利率</th><th>EPS（元）</th></tr></thead>
+<tbody>
+<tr><td>2Q26F</td><td class="num">27.66</td><td class="num pos">+18.1%</td><td class="num"><strong>27.51%</strong></td><td class="num">3.55</td></tr>
+<tr><td>3Q26F</td><td class="num">32.63</td><td class="num pos">+18.0%</td><td class="num">29.33%</td><td class="num">4.84</td></tr>
+<tr><td>4Q26F</td><td class="num">35.15</td><td class="num pos">+7.7%</td><td class="num">30.26%</td><td class="num">5.54</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>合約負債與在手訂單的背離</h4>
+<div class="tw">
+<table>
+<thead><tr><th>時間點</th><th class="wrap">合約負債（億，MoneyDJ）</th><th class="wrap">在手訂單（億，中信訪查）</th></tr></thead>
+<tbody>
+<tr><td>2024Q4</td><td class="num">20.09（高峰）</td><td class="num">約 100（2024 年水準）</td></tr>
+<tr><td>2025Q1</td><td class="num">17.10</td><td>-</td></tr>
+<tr><td>2025Q2</td><td class="num">13.41</td><td>-</td></tr>
+<tr><td>2025Q3</td><td class="num">13.41</td><td>-</td></tr>
+<tr><td>2025Q4</td><td class="num">10.97</td><td class="num">60 幾億</td></tr>
+<tr><td>1Q26</td><td>（待 MoneyDJ 更新）</td><td class="num">103</td></tr>
+<tr><td>4M26</td><td>-</td><td class="num"><strong>130（往 150 邁進）</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout key">
+<span class="ct">💡 背離解讀</span>
+合約負債（已預收款項）自 2024Q4 高峰一路下滑，但在手訂單自 4Q25 起翻倍以上躍升。背離主因：（1）新接大型專案多處於設計/下料/客戶審核階段，尚未進入收款里程碑；（2）廠務上游材料短缺（部分長交期材料等待達半年），客戶以先下長交期訂單（類似訂金概念）鎖定產能，此類訂單尚未反映於預收款。<strong>結論：合約負債作為領先指標的效力暫時失靈，當前應以在手訂單與月營收為主要追蹤指標</strong>；但也須留意在手訂單為券商訪查數字，非財報科目，無法直接稽核。
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="card" id="s4" data-title="4. 籌碼數據分析">
+<h2><span class="no">4</span>籌碼數據分析 <small>Chip Analysis</small></h2>
+
+<h3>4.1 集保戶股權分散表 (TDCC)</h3>
+<div class="tw">
+<table>
+<thead><tr><th>日期</th><th>持股超過 200 張（%）</th><th>持股超過 1,000 張（%）</th><th class="wrap">變化解讀</th></tr></thead>
+<tbody>
+<tr><td>2026/06/05</td><td class="num"><strong>65.65%</strong></td><td class="num"><strong>55.52%</strong></td><td class="wrap">籌碼高度集中</td></tr>
+<tr><td>2026/05/29</td><td class="num">65.94%</td><td class="num">55.52%</td><td>-</td></tr>
+<tr><td>2026/05/22</td><td class="num">65.67%</td><td class="num">55.52%</td><td>-</td></tr>
+<tr><td>2026/05/15</td><td class="num">65.57%</td><td class="num">55.52%</td><td>-</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout good">
+<span class="ct">✅ 解讀</span>
+千張大戶持股穩定在 55.52%——此即母公司聖暉（5536）的持股，等同鎖定逾半籌碼。中實戶（超過 200 張）維持在 65.6% 上下，籌碼結構高度集中。實際流通籌碼有限，漲跌幅都容易被放大，這是雙面刃。
+</div>
+
+<h3>4.2 三大法人買賣超</h3>
+<p>近 5 日三大法人買賣超動向（單位：張）：</p>
+<div class="tw">
+<table>
+<thead><tr><th>日期</th><th>外資</th><th>投信</th><th>自營商</th><th>三大法人合計</th></tr></thead>
+<tbody>
+<tr><td>2026/06/09</td><td class="num pos">+51.4</td><td class="num neg">-0.4</td><td class="num pos">+1.7</td><td class="num pos">+52.6</td></tr>
+<tr><td>2026/06/08</td><td class="num pos">+16.3</td><td class="num">0.0</td><td class="num neg">-20.6</td><td class="num neg">-4.2</td></tr>
+<tr><td>2026/06/05</td><td class="num neg">-47.9</td><td class="num neg">-0.2</td><td class="num neg">-7.5</td><td class="num neg">-55.7</td></tr>
+<tr><td>2026/06/04</td><td class="num pos">+28.4</td><td class="num">0.0</td><td class="num neg">-6.4</td><td class="num pos">+22.0</td></tr>
+<tr><td>2026/06/03</td><td class="num pos">+27.0</td><td class="num">0.0</td><td class="num neg">-0.7</td><td class="num pos">+26.3</td></tr>
+<tr><td><strong>累計</strong></td><td class="num pos"><strong>+75.2</strong></td><td class="num neg"><strong>-0.6</strong></td><td class="num neg"><strong>-33.5</strong></td><td class="num pos"><strong>+41.1</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout info">
+<span class="ct">📊 解讀</span>
+外資近 5 日 4 天買超、累計 +75.2 張，為主要買盤；自營商小幅調節，投信無部位。惟絕對量體小（單日數十張），對股價的解釋力有限，籌碼面主要仍由大戶結構決定。外資持股比 7.71%（中信 6/10），較 2 月的 5.60% 上升，中期趨勢偏多。
+</div>
+
+<h3>4.3 融資融券趨勢</h3>
+<p>最近可得資料（2026/05/04，MoneyDJ）：融資餘額 838 張、無券賣，券資比 0%。融資餘額自 4 月下旬緩增（786 至 838 張），水位仍低。</p>
+<div class="callout warn">
+⚠️ 股價自 5 月初 236 元漲至 266 元（漲幅約 13%），需持續觀察融資是否加速堆積形成浮額；目前尚無過熱跡象。
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="card" id="s5" data-title="5. 產業與基本面深度分析">
+<h2><span class="no">5</span>產業與基本面深度分析 <small>Deep Dive</small></h2>
+
+<h3>產業定位</h3>
+<p>朋億為<strong>半導體廠務系統</strong>供應商，成立於 1997 年，三大業務：</p>
+<ul>
+<li>高潔淨度化學品供應與分裝系統、特殊氣體供應系統（水氣化供應系統）</li>
+<li>濕製程設備（Wet Process）</li>
+<li>剝離廢液再生、綠能環保系統整合</li>
+</ul>
+
+<h3>產業上下游關係</h3>
+<div class="flow">上游：化學品/氣體/廠務材料供應商 → 朋億（系統整合與設備製造） → 下游：晶圓廠/記憶體廠/封測廠/面板廠</div>
+
+<h3>關鍵驅動因素</h3>
+<div class="tw wide">
+<table>
+<thead><tr><th class="wrap">驅動因素</th><th class="wrap">正面影響</th><th class="wrap">負面影響</th></tr></thead>
+<tbody>
+<tr><td class="wrap">記憶體大擴產潮（美光日本/台灣/新加坡/美國多廠）</td><td class="wrap">化學主系統訂單爆發，為本輪成長主軸</td><td class="wrap">擴產計畫若延後，認列遞延</td></tr>
+<tr><td class="wrap">中國邏輯/記憶體建廠回溫（中芯、華虹、長鑫、長江）</td><td class="wrap">中國基地（上海、蘇州）就近承接</td><td class="wrap">中國案毛利率僅約 15-20%，拉低整體毛利率；地緣政治風險</td></tr>
+<tr><td class="wrap">台系 OSAT 先進封裝擴建（虎尾等複數建案）</td><td class="wrap">設備包與二次配訂單</td><td class="wrap">客戶驗證期長</td></tr>
+<tr><td class="wrap">廠務上游材料短缺</td><td class="wrap">訂單能見度提前鎖定（長交期訂單）</td><td class="wrap">交貨遞延風險，認列時點不確定</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>公司優勢</h3>
+<ol>
+<li><strong>技術與經驗門檻</strong>：具備 Foundry、記憶體廠承做經驗，廠務系統整合專業門檻高</li>
+<li><strong>客戶黏著度高</strong>：一旦導入，轉換成本極高</li>
+<li><strong>集團綜效</strong>：聖暉（5536）持股 55.52%，集團加持有助斬獲台積電、美光等業主訂單</li>
+<li><strong>據點佈局完善</strong>：中國（上海、蘇州）、新加坡（Novatech E&amp;C）、馬來西亞、日本、美國</li>
+</ol>
+
+<h3>公司弱勢</h3>
+<ol>
+<li><strong>毛利率隨產品組合大幅波動</strong>：中國大型新建案毛利率約 15-20%，與小型擴充工程（30% 以上）落差大，單季毛利率波動可達 5 個百分點以上（如 1Q26 的 32.1% 對 2Q26F 的 27.5%）</li>
+<li><strong>區域集中度</strong>：中國占比約 45%（4Q25），出口管制與地緣政治風險須持續監控</li>
+<li><strong>流通籌碼有限</strong>：市值約 198 億元（中信 6/10），聖暉鎖定 55.52%，外資持股僅 7.71%，流動性受限</li>
+<li><strong>主要競爭對手</strong>：帆宣（6196）、矽科宏晟（6725），大型案存在殺價競爭風險</li>
+</ol>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="card" id="s6" data-title="6. 估值分析">
+<h2><span class="no">6</span>估值分析 <small>Valuation Analysis</small></h2>
+
+<h3>6.1 多重估值法</h3>
+<h4>本益比法（P/E），現價 266 元</h4>
+<div class="tw narrow">
+<table>
+<thead><tr><th>基準</th><th>EPS</th><th>隱含 PE</th></tr></thead>
+<tbody>
+<tr><td>Trailing（2025 實際）</td><td class="num">13.37</td><td class="num">19.9x</td></tr>
+<tr><td>Forward（2026E，中信）</td><td class="num">17.77</td><td class="num"><strong>15.0x</strong></td></tr>
+<tr><td>2027E（中信）</td><td class="num">23.55</td><td class="num">11.3x</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>中信歷次目標價採 14x 至 17x PER；本報告同業比較（見第 10 章）Trailing PE 均值約 35.9x</li>
+<li>朋億過往因「成熟製程概念」被給予較低本益比；評價收斂的催化劑為客戶版圖多元化（記憶體、台系 OSAT）兌現程度</li>
+</ul>
+<div class="callout good">
+<span class="ct">✅ 結論</span>
+Forward PE 15.0x 相對同業有顯著折價。但須誠實面對折價存在的理由：單一券商覆蓋、流通籌碼少、中國占比高、毛利率波動大。折價收斂需要 2Q26 起的財報逐季驗證，而非一步到位。
+</div>
+
+<h4>股價淨值比（P/B）</h4>
+<ul>
+<li>最新每股淨值 <strong>65.69 元</strong>（1Q26）</li>
+<li>當前 P/B：266 / 65.69 = <strong>4.05x</strong></li>
+<li>歷史 P/B 區間約 1.5x - 4.5x，<strong>目前處於區間上緣</strong>，已反映高成長預期</li>
+</ul>
+
+<h4>殖利率支撐</h4>
+<ul>
+<li>2025 年度股息 10 元（現價殖利率約 3.8%）；中信預估 2026 年度股息 13.3 元（約 5.0%）</li>
+<li>歷年配發率約 6-7 成，為下檔保護來源之一</li>
+</ul>
+
+<h3>6.2 目標價推算</h3>
+<div class="tw">
+<table>
+<thead><tr><th>情境</th><th>估值方法</th><th>預估基準</th><th>目標價</th><th>時間尺度</th></tr></thead>
+<tbody>
+<tr><td>保守</td><td>PE 15x</td><td>2026E EPS 17.77</td><td class="num"><strong>266</strong></td><td>12 個月</td></tr>
+<tr><td>中性</td><td>PE 17x</td><td>2026E EPS 17.77</td><td class="num"><strong>302</strong></td><td>12 個月</td></tr>
+<tr><td>樂觀</td><td>PE 17x</td><td>2027E EPS 23.55</td><td class="num"><strong>400</strong></td><td>12-18 個月（中信目標價）</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout warn">
+<span class="ct">⚠️ 估值警示</span>
+現價 266 元已等於保守目標價，意即「2026 年業績兌現 + 15 倍評價」已被完全定價。後續上漲動能須來自（1）中性情境的評價提升至 17x，或（2）市場提前反映 2027 年業績。P/B 4.05x 處於歷史上緣亦提示：當前價位的安全邊際來自成長兌現，而非便宜。
+</div>
+
+<h3>6.3 中信目標價上修的三因子拆解（265 → 400 元，+51%）</h3>
+<p>任何券商目標價變動可拆為三個乘數，逐一檢驗佐證強度：</p>
+<div class="tw wide">
+<table>
+<thead><tr><th>因子</th><th class="wrap">變化</th><th>貢獻</th><th class="wrap">可信度評估</th></tr></thead>
+<tbody>
+<tr><td>EPS 上修</td><td class="wrap">2027E 19.06 → 23.55 元</td><td class="num pos"><strong>+23.6%</strong></td><td class="wrap">較高：有 1Q26 實績超預期、在手訂單訪查（103 → 130 億）佐證</td></tr>
+<tr><td>估值倍數擴張</td><td class="wrap">15x → 17x</td><td class="num pos"><strong>+13.3%</strong></td><td class="wrap">較低：由「廠務供不應求」敘事驅動，無獨立可驗證數據</td></tr>
+<tr><td>基準年延伸</td><td class="wrap">2H26-1H27（隱含 EPS 約 17.7 元）→ 2027 全年</td><td class="num pos"><strong>+7.9%</strong></td><td class="wrap">最隱蔽：估值基準悄悄推遠約半年，變相提前折現</td></tr>
+</tbody>
+</table>
+</div>
+<p>驗算：1.236 × 1.133 × 1.079 ≈ 1.51，即 265 × 1.51 ≈ 400 ✓</p>
+<div class="callout warn">
+<span class="ct">⚠️ 戴維斯雙殺壓力測試</span>
+本次上修是 EPS、倍數、基準年三者同向的乘法效應（雙擊），但反向具不對稱速度——倍數壓縮瞬間反映市場情緒，EPS 下修則等財報驗證。若 2Q26 不如預期、預估退回 2 月版本（2027E 19.06 元、15x、基準縮回 2H26-1H27），目標價即回到 <strong>265 元</strong>，現價上檔歸零；若進一步落入保守情境（2026E 15.5 元 × 15x），對應 <strong>233 元</strong>，較現價約 -12%。三因子中有兩項（倍數、基準年）缺乏獨立佐證，是 400 元目標價的主要脆弱點。
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="card" id="s7" data-title="7. 競爭優勢護城河">
+<h2><span class="no">7</span>競爭優勢護城河分析 <small>Competitive Moat</small></h2>
+<div class="tw">
+<table>
+<thead><tr><th>評估維度</th><th>評分</th><th class="wrap">說明</th></tr></thead>
+<tbody>
+<tr><td>技術護城河</td><td><span class="stars">★★★★☆</span></td><td class="wrap">廠務系統整合專業門檻高，具記憶體/Foundry 承做經驗</td></tr>
+<tr><td>客戶黏著度</td><td><span class="stars">★★★★☆</span></td><td class="wrap">轉換成本高，長期合作關係；惟大型新建案仍須競標（美光新加坡案曾因價格競爭僅取得 slurry 訂單）</td></tr>
+<tr><td>規模經濟</td><td><span class="stars">★★★☆☆</span></td><td class="wrap">規模小於帆宣等大廠，大型案議價力受限</td></tr>
+<tr><td>網路效應</td><td><span class="stars">★★☆☆☆</span></td><td class="wrap">無明顯網路效應</td></tr>
+<tr><td>法規護城河</td><td><span class="stars">★★☆☆☆</span></td><td class="wrap">無特殊執照需求</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>綜合評分</strong>：<span class="stars">★★★☆☆</span>（中等護城河）——供不應求的市況暫時放大了議價力（可挑案、挑毛利率），但此屬週期紅利而非結構性護城河，景氣反轉時會雙向放大。</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="card" id="s8" data-title="8. 情境分析">
+<h2><span class="no">8</span>情境分析 <small>Scenario Analysis</small></h2>
+<p><strong>基準：2026 全年（1Q26 實際 + 中信季度預估推算），目標價一律以 PE 17x × 2026E EPS 計</strong></p>
+<div class="tw wide">
+<table>
+<thead><tr><th>情境</th><th>機率</th><th class="wrap">關鍵假設</th><th>2026 EPS</th><th>目標價</th></tr></thead>
+<tbody>
+<tr><td>樂觀</td><td class="num">30%</td><td class="wrap">台灣區高毛利案放量超預期，全年毛利率守住 31% 以上，年底在手訂單破 150 億</td><td class="num"><strong>18.5 元</strong></td><td class="num"><strong>314 元</strong></td></tr>
+<tr><td>中性</td><td class="num">50%</td><td class="wrap">2H26 營收逐季成長如中信預估，全年毛利率 29.7%</td><td class="num"><strong>17.77 元</strong></td><td class="num"><strong>302 元</strong></td></tr>
+<tr><td>保守</td><td class="num">20%</td><td class="wrap">2Q26 中國案毛利率壓縮超預期，且材料短缺使 2H26 認列遞延</td><td class="num"><strong>15.5 元</strong></td><td class="num"><strong>263 元</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout key">
+<span class="ct">❗ IMPORTANT</span>
+機率加權期望目標價約 <strong>297 元</strong>（314×0.3 + 302×0.5 + 263×0.2），對照現價 266 元，隱含 12 個月期望報酬約 +12%。<strong>中信的 400 元目標價屬 2027 年業績的提前反映，不在本表 2026 年情境之內</strong>——兩者時間尺度不同，混用會高估短期上檔。
+</div>
+<div class="callout warn">
+<span class="ct">⚠️ 機率紀律聲明</span>
+上表機率為研究者主觀賦值，目前僅有中信單一覆蓋、無法人共識分布可校準。後續每月營收與 2Q26 財報開出時，須回測情境假設本身是否錯誤（而非只更新數字）：例如 6 月營收若低於 9 億，代表中性情境的「2Q26 營收 27.7 億」假設失效，應同步下調中性機率，而非僅微調 EPS。
+</div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="card" id="s9" data-title="9. 風險評估">
+<h2><span class="no">9</span>風險評估 <small>Risk Assessment</small></h2>
+
+<h3>9.1 風險評分卡</h3>
+<div class="tw">
+<table>
+<thead><tr><th>風險類別</th><th>評分</th><th class="wrap">說明</th></tr></thead>
+<tbody>
+<tr><td>產業風險</td><td><span class="stars">★★★☆☆</span></td><td class="wrap">半導體週期波動大；2026 上行週期已由訂單與營收雙重確認</td></tr>
+<tr><td>財務風險</td><td><span class="stars">★★☆☆☆</span></td><td class="wrap">1Q26 現金 36.56 億、無重大長債，財務穩健</td></tr>
+<tr><td>估值風險</td><td><span class="stars">★★★★☆</span></td><td class="wrap">P/B 處歷史上緣、現價已達保守目標價，回檔空間大於安全邊際</td></tr>
+<tr><td>資訊風險</td><td><span class="stars">★★★☆☆</span></td><td class="wrap">單一券商覆蓋；在手訂單為訪查數字，非可稽核之財報科目</td></tr>
+<tr><td>管理風險</td><td><span class="stars">★★☆☆☆</span></td><td class="wrap">經營團隊穩定，聖暉集團治理加持</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>9.2 關鍵風險因素</h3>
+<ol>
+<li><strong>2Q26 毛利率檢驗</strong>：中信預估 2Q26 毛利率自 32.1% 降至 27.5%。若實際低於此水準，「毛利率具改善契機」的上修敘事將受打擊，股價對此敏感度高。</li>
+<li><strong>上游材料交期</strong>：部分長交期材料等待達半年，營收認列時點可能遞延，使單季財報低於預期（中信列為首要風險因子）。</li>
+<li><strong>同業殺價競爭</strong>：美光新加坡案的前例顯示，大型案競標中朋億可能因價格競爭縮減量體；帆宣、矽科宏晟均在爭奪同一波擴產需求。</li>
+<li><strong>中國與地緣政治</strong>：中國營收占比約 45%，出口管制升級或中國需求再度放緩均構成下行風險。</li>
+<li><strong>估值與籌碼</strong>：現價已反映保守情境，且 6/10 單日上漲逾 4%（中信上修目標價當日），追價者承擔短線利多出盡風險；流通籌碼少使回檔同樣猛烈。</li>
+</ol>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="card" id="s10" data-title="10. 同業觀察與比較">
+<h2><span class="no">10</span>同業觀察與比較 <small>Peer Comparison</small></h2>
+<div class="tw wide">
+<table>
+<thead><tr><th>公司</th><th>代號</th><th>股價</th><th>2025 EPS</th><th>Trailing PE</th><th class="wrap">動態觀察</th><th>趨勢</th></tr></thead>
+<tbody>
+<tr><td><strong>朋億</strong></td><td>6613</td><td class="num"><strong>266.0</strong></td><td class="num"><strong>13.37</strong></td><td class="num"><strong>19.9x</strong></td><td class="wrap">1Q26 EPS 3.84 元（YoY +28.8%），在手訂單 130 億</td><td>↑ 強勢</td></tr>
+<tr><td>信紘科</td><td>6667</td><td class="num">274.5</td><td class="num">14.60</td><td class="num">18.8x</td><td class="wrap">營收動能穩定，半導體廠務拉貨強</td><td>→ 平穩</td></tr>
+<tr><td>聖暉</td><td>5536</td><td class="num">1140.0</td><td class="num">31.25</td><td class="num">36.5x</td><td class="wrap">母公司，持股朋億 55.52%</td><td>↑ 回升</td></tr>
+<tr><td>帆宣</td><td>6196</td><td class="num">532.0</td><td class="num">12.05</td><td class="num">44.1x</td><td class="wrap">廠務訂單能見度高，材料短缺待解</td><td>→ 平穩</td></tr>
+<tr><td>漢唐</td><td>2404</td><td class="num">1185.0</td><td class="num">26.80</td><td class="num">44.2x</td><td class="wrap">台積電擴產主力，評價享高溢價</td><td>↑ 強勢</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout info">
+<span class="ct">📝 同業評價比較</span>
+朋億 Trailing PE 19.9x 低於同業均值（約 35.9x），Forward PE 15.0x 折價更明顯。惟折價部分反映體質差異（流通籌碼、覆蓋度、中國占比），合理收斂目標宜對標體質最接近的信紘科（18.8x）而非漢唐/帆宣的 44x。<br>
+<small>（註：同業股價與 EPS 為 2026 年 6 月初彙整，未經即時逐筆驗證，引用前請確認。）</small>
+</div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="card" id="s11" data-title="11. 管理層評估">
+<h2><span class="no">11</span>管理層評估 <small>Management Assessment</small></h2>
+<div class="tw">
+<table>
+<thead><tr><th>評估項目</th><th>評分</th><th class="wrap">說明</th></tr></thead>
+<tbody>
+<tr><td>過往承諾達成率</td><td><span class="stars">★★★★☆</span></td><td class="wrap">中信評價「營收如預期開出且通常優於預期」；1Q26 實際即優於其預估</td></tr>
+<tr><td>資本配置策略</td><td><span class="stars">★★★☆☆</span></td><td class="wrap">歷年配發率約 6-7 成；2025 年度股息 10 元，中信預估 2026 年度 13.3 元</td></tr>
+<tr><td>財報透明度</td><td><span class="stars">★★★☆☆</span></td><td class="wrap">定期公告營收；法說頻率低（2025/09 凱基論壇為近期少數公開簡報）</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="card" id="s12" data-title="12. 投資決策檢查清單">
+<h2><span class="no">12</span>投資決策檢查清單 <small>Investment Checklist</small></h2>
+
+<h3>進場前檢查</h3>
+<ul class="checklist">
+<li class="done">月營收持續成長？✅ 前 5 月累計 YoY +25.8%，5 月 YoY +81.7%</li>
+<li class="done">在手訂單充足？✅ 4M26 達 130 億創歷史紀錄（惟為訪查數字，非財報科目）</li>
+<li class="warn">估值合理？⚠️ Forward PE 15.0x 相對同業折價，但現價已達保守目標價 266，P/B 處歷史上緣</li>
+<li class="done">無重大利空？✅ 未見重大負面消息</li>
+<li class="done">技術面站穩？✅ 多頭排列，惟距月線乖離有限、距 270 壓力僅 1.5%</li>
+</ul>
+
+<h3>持有中監控</h3>
+<ul class="checklist">
+<li class="done">2025 年報符合預期？✅ EPS 13.37 元，優於市場悲觀預期</li>
+<li class="done">1Q26 財報確認？✅ EPS 3.84 元，優於中信預估 3.2 元</li>
+<li class="todo"><strong>2Q26 財報毛利率？預計 2026/08 中旬公布，驗證 27.5% 預估，為當前最重要觀察點</strong></li>
+<li class="todo">在手訂單是否如期往 150 億邁進？追蹤中信後續更新與月營收轉換</li>
+<li class="done">技術面穩健？✅ 站穩月線之上</li>
+</ul>
+</section>
+
+<!-- ============ 13 ============ -->
+<section class="card" id="s13" data-title="13. 關鍵事件日曆">
+<h2><span class="no">13</span>關鍵事件日曆 <small>Key Events Calendar</small></h2>
+<div class="tw">
+<table>
+<thead><tr><th>日期</th><th class="wrap">事件</th><th>重要性</th></tr></thead>
+<tbody>
+<tr><td>每月 10 日前</td><td class="wrap">月營收公告（驗證 2Q26 27.7 億預估，6 月需開出約 9.7 億以上）</td><td><span class="stars">★★★★</span></td></tr>
+<tr><td>2026/06（預估）</td><td class="wrap">股東會</td><td><span class="stars">★★★</span></td></tr>
+<tr><td>2026/08 中旬（預估）</td><td class="wrap"><strong>2Q26 財報：毛利率 27.5% 預估之驗證點</strong></td><td><span class="stars">★★★★★</span></td></tr>
+<tr><td>2026/Q3（預估）</td><td class="wrap">除息（2025 年度股息 10 元）</td><td><span class="stars">★★★</span></td></tr>
+<tr><td>2026/11 中旬（預估）</td><td class="wrap">3Q26 財報：台灣區放量與毛利率回升驗證</td><td><span class="stars">★★★★★</span></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="card" id="s14" data-title="14. 技術面深度分析">
+<h2><span class="no">14</span>技術面深度分析 <small>Technical Analysis</small></h2>
+
+<h3>均線架構</h3>
+<ul>
+<li><strong>現價 266.0 元 vs 月線 260 元</strong>：✅ 站上（+2.3%）</li>
+<li><strong>現價 266.0 元 vs 季線 235.4 元</strong>：✅ 站上（+13.0%）</li>
+<li><strong>均線排列</strong>：多頭排列（短均在上、月線高於季線）</li>
+</ul>
+
+<h3>型態學分析</h3>
+<ul>
+<li><strong>近期型態</strong>：股價沿月線強勢創高，6/10 受中信上修目標價激勵跳漲（基準價 255 至現價 266）</li>
+<li><strong>關鍵支撐</strong>：260（月線）、235（季線）</li>
+<li><strong>關鍵壓力</strong>：270（近期高點，距現價僅 1.5%）</li>
+</ul>
+
+<h3>操作建議</h3>
+<p>與第 1 章進場策略表一致：</p>
+<div class="tw narrow">
+<table>
+<thead><tr><th>策略</th><th>進場點</th><th>停損</th><th>目標</th></tr></thead>
+<tbody>
+<tr><td>動能試單（輕倉）</td><td class="num">266-270</td><td class="num">258</td><td class="num">302</td></tr>
+<tr><td>回檔佈局（核心）</td><td class="num">250-260</td><td class="num">235</td><td class="num">302-400</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout warn">
+⚠️ 季線乖離率 +13.0%，短線乖離偏大；歷史上此類乖離常以回測月線方式收斂，支持「回檔佈局優於追價」的結論。
+</div>
+</section>
+
+<!-- ============ 15 ============ -->
+<section class="card" id="s15" data-title="15. 未來觀察重點">
+<h2><span class="no">15</span>未來觀察重點 <small>Research Outlook</small></h2>
+<ol>
+<li><strong>在手訂單</strong>：2Q26 能否如中信預期往 150 億元邁進（同時認列 27 億後仍淨增）</li>
+<li><strong>2Q26 毛利率</strong>：27.5% 預估的驗證；低於 26% 即為警訊</li>
+<li><strong>台灣區域放量</strong>：3Q26 起高毛利台灣案認列進度，驅動毛利率回升至 29% 以上</li>
+<li><strong>台系客戶機台驗證</strong>：濕製程機台 demo 驗證原預期 2026 年中取得核可，進入封裝廠競標行列——追蹤是否如期</li>
+<li><strong>材料短缺與交期</strong>：長交期材料（等待達半年）對認列節奏的影響</li>
+<li><strong>中國占比與毛利率結構</strong>：區域組合變化對單季毛利率的擾動</li>
+<li><strong>融資餘額</strong>：自低水位（838 張）是否加速堆積</li>
+</ol>
+</section>
+
+<!-- ============ 16 ============ -->
+<section class="card" id="s16" data-title="16. 建議提問範例">
+<h2><span class="no">16</span>建議提問範例 <small>Q&amp;A Examples</small></h2>
+<ol>
+<li>在手訂單 130 億中，長交期訂單（訂金性質）占比多少？取消或遞延的違約條款如何設計？</li>
+<li>2Q26 中國案毛利率實際落點？中國大型案 15-20% 毛利率的報價環境是否改善？</li>
+<li>台系客戶濕製程機台驗證進度？是否如期於 2026 年中取得核可？</li>
+<li>材料短缺下，公司備料策略對營運資金與存貨跌價風險的影響？</li>
+<li>毛利率自 2024 年 29.8% 升至 2025 年 32.4%，再預估回落至 29.7%——產品組合各占多少貢獻？</li>
+<li>與帆宣、矽科宏晟在記憶體擴產案的競標勝率與定價策略差異？</li>
+</ol>
+</section>
+
+<!-- ============ 17 ============ -->
+<section class="card" id="s17" data-title="17. 附錄：券商報告彙整">
+<h2><span class="no">17</span>附錄：券商報告彙整 <small>Appendix</small></h2>
+
+<h3>已分析報告清單</h3>
+<div class="tw wide">
+<table>
+<thead><tr><th>日期</th><th>券商/投顧</th><th>評等</th><th>目標價</th><th>當時股價</th><th>2026E EPS</th><th>2027E EPS</th></tr></thead>
+<tbody>
+<tr><td>2026/06/10</td><td>中信證券</td><td><strong>買進（B）</strong></td><td class="num"><strong>400</strong></td><td class="num">255</td><td class="num"><strong>17.77</strong></td><td class="num"><strong>23.55</strong></td></tr>
+<tr><td>2026/02/24</td><td>中信證券</td><td>買進（B）</td><td class="num">265</td><td class="num">194</td><td class="num">15.37</td><td class="num">19.06</td></tr>
+<tr><td>2025/11/24</td><td>中信證券</td><td>買進（B）</td><td class="num">235</td><td class="num">169</td><td class="num">16.15</td><td class="num">18.40</td></tr>
+<tr><td>2025/08/22</td><td>中信證券</td><td>買進（B）</td><td class="num">245</td><td class="num">197</td><td class="num">16.22</td><td>-</td></tr>
+<tr><td>2025/07/14</td><td>中信證券</td><td>買進（B）首評</td><td class="num">225</td><td class="num">177.5</td><td class="num">16.08</td><td>-</td></tr>
+<tr><td>2025/09/04</td><td>凱基論壇</td><td>（公司簡報）</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>財測上修軌跡（中信證券）</h3>
+<div class="tw wide">
+<table>
+<thead><tr><th>報告日期</th><th>26E 營收（億）</th><th>26E 毛利率</th><th>26E EPS</th><th>27E 營收（億）</th><th>27E EPS</th><th>目標價</th></tr></thead>
+<tbody>
+<tr><td>2026/06/10</td><td class="num">118.9</td><td class="num">29.7%</td><td class="num"><strong>17.77</strong></td><td class="num">148.7</td><td class="num"><strong>23.55</strong></td><td class="num">400</td></tr>
+<tr><td>2026/02/24</td><td class="num">112.0</td><td class="num">28.1%</td><td class="num">15.37</td><td class="num">129.4</td><td class="num">19.06</td><td class="num">265</td></tr>
+<tr><td>2025/11/24</td><td class="num">110.5</td><td class="num">29.2%</td><td class="num">16.15</td><td class="num">126.9</td><td class="num">18.40</td><td class="num">235</td></tr>
+<tr><td>2025/08/22</td><td class="num">114.8</td><td class="num">28.1%</td><td class="num">16.22</td><td>-</td><td>-</td><td class="num">245</td></tr>
+<tr><td>2025/07/14</td><td class="num">114.2</td><td class="num">29.0%</td><td class="num">16.08</td><td>-</td><td>-</td><td class="num">225</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout warn">
+<span class="ct">📝 反面提醒</span>
+半年內目標價自 235 元上修至 400 元（+70%），上修依據為在手訂單躍升與毛利率展望改善。上修軌跡陡峭本身即是風險——若任一驗證點（2Q26 毛利率、訂單轉換）失誤，下修的幅度與速度可能同樣劇烈（詳見第 6.3 節三因子拆解）。
+</div>
+
+<h3>在手訂單變化軌跡</h3>
+<div class="tw narrow">
+<table>
+<thead><tr><th>時間點</th><th>在手訂單（億）</th><th>來源</th></tr></thead>
+<tbody>
+<tr><td>4M26</td><td class="num"><strong>130（往 150 邁進）</strong></td><td>中信 2026/06/10</td></tr>
+<tr><td>1Q26</td><td class="num">103</td><td>中信 2026/02/24</td></tr>
+<tr><td>4Q25</td><td class="num">60 幾億</td><td>中信 2026/02/24</td></tr>
+<tr><td>2025 年中</td><td class="num">70</td><td>中信 2025/07/14</td></tr>
+<tr><td>2024</td><td class="num">約 100</td><td>中信 2025/07/14</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>中信證券 2026/06/10 報告重點摘錄</h3>
+<div class="tw wide">
+<table>
+<thead><tr><th>指標</th><th>2024</th><th>2025</th><th>2026F</th><th>2027F</th></tr></thead>
+<tbody>
+<tr><td>營收（億）</td><td class="num">103.82</td><td class="num">89.15</td><td class="num"><strong>118.86</strong></td><td class="num"><strong>148.75</strong></td></tr>
+<tr><td>營收 YoY</td><td class="num pos">+13.59%</td><td class="num neg">-14.13%</td><td class="num pos">+33.32%</td><td class="num pos">+25.15%</td></tr>
+<tr><td>毛利率</td><td class="num">29.81%</td><td class="num">32.36%</td><td class="num">29.73%</td><td class="num">30.32%</td></tr>
+<tr><td>營益率</td><td class="num">18.51%</td><td class="num">19.02%</td><td class="num">19.14%</td><td class="num">20.62%</td></tr>
+<tr><td>稅後淨利（億）</td><td class="num">12.79</td><td class="num">10.40</td><td class="num">13.83</td><td class="num">18.33</td></tr>
+<tr><td>調整後 EPS（元）</td><td class="num">16.61</td><td class="num">13.37</td><td class="num"><strong>17.77</strong></td><td class="num"><strong>23.55</strong></td></tr>
+<tr><td>ROE</td><td class="num">28.73%</td><td class="num">20.19%</td><td class="num">25.10%</td><td class="num">31.01%</td></tr>
+<tr><td>股息（元）</td><td class="num">11.90</td><td class="num">10.00</td><td class="num">13.30</td><td class="num">17.70</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout info">
+<span class="ct">📝 中信分析師觀點（2026/06/10）</span>
+<ul>
+<li>1Q26 為全年谷底，2Q26 營收估 27.7 億（QoQ +18%），2H26 增速更勝 1H26</li>
+<li>毛利率：2Q26 受中國占比拉高降至 27.5%，3Q26 起隨台灣區放量逐季回升</li>
+<li>2027 年營收年增 25%，潛在建案包括新加坡成熟製程、美系記憶體新建案、台系記憶體、台系 OSAT 複數建案、日本美系記憶體專案</li>
+<li>目標價 400 元（2027 年 EPS × 17 倍 PER），風險因子：上游材料交貨困難、同業殺價競爭</li>
+</ul>
+</div>
+
+<h3>凱基論壇公司簡報重點（2025/09/04）</h3>
+<h4>公司基本資料</h4>
+<ul>
+<li>董事長：梁進利 / 總經理：馬蔚</li>
+<li>資本額：3.89 億元（77,801 千股）</li>
+<li>員工人數：公司 145 人 / 集團合計 928 人</li>
+<li>上櫃日期：民國 106 年 12 月 28 日</li>
+</ul>
+<h4>集團架構（母公司：聖暉 5536 持股 55.52%）</h4>
+<ul>
+<li>寶韻科技（100%）</li>
+<li>蘇州冠禮科技（86.59%）</li>
+<li>銳澤實業 7703（41.46%）</li>
+<li>理海技研（80%）</li>
+<li>達德設計（53%）</li>
+<li>Novatech Engineering &amp; Construction Pte. Ltd.（新加坡，100%）</li>
+<li>Rayzher Technology Malaysia Sdn. Bhd.（馬來西亞，100%）</li>
+</ul>
+<h4>營收佔比（114 年 H1）</h4>
+<ul>
+<li>朋億母公司：38%</li>
+<li>Novatech E&amp;C（新加坡）：28%</li>
+<li>銳澤實業 7703：19%</li>
+<li>冠禮控制科技（上海）：15%</li>
+</ul>
+<h4>產品組成（114 年 H1）</h4>
+<ul>
+<li>高科技製程設備製造：約 48%（營收 20.07 億）</li>
+<li>水氣化系統整合服務工程：約 46%</li>
+<li>綠色永續整合等其他：6%</li>
+</ul>
+
+<h3>市場共識整理</h3>
+<h4>看多理由</h4>
+<ul>
+<li>在手訂單 130 億創歷史紀錄，且往 150 億邁進，能見度跨至 2027 年</li>
+<li>記憶體大擴產潮（美光多廠）、中國建廠回溫、台系 OSAT 擴建三引擎並進</li>
+<li>廠務市場供不應求，毛利率展望上修</li>
+<li>評價低於同業，且有殖利率下檔保護</li>
+</ul>
+<h4>風險提示</h4>
+<ul>
+<li>上游材料交期長達半年，認列遞延風險</li>
+<li>2Q26 毛利率季減至 27.5%（中國案占比拉高）</li>
+<li>同業殺價競爭（帆宣、矽科宏晟）</li>
+<li>單一券商覆蓋，市場共識實為單一觀點</li>
+</ul>
+<h4>關鍵資訊</h4>
+<ul>
+<li>2024 年 EPS 17.10 元為前波高峰，2025 年 13.37 元落底，2026E 17.77 元重回高峰之上</li>
+<li>中信半年內三度上修：目標價 235 → 265 → 400 元</li>
+<li>合約負債持續下滑但在手訂單翻倍，領先指標已從合約負債切換為在手訂單</li>
+</ul>
+</section>
+
+<!-- ============ 結語 ============ -->
+<section class="card" id="s18" data-title="結語">
+<h2><span class="no">✦</span>結語</h2>
+<p>朋億（6613）為半導體廠務系統專業供應商。<strong>4M26 在手訂單 130 億元創歷史紀錄</strong>（2024 年高峰約 100 億），加上 1Q26 財報優於預期（EPS 3.84 元，YoY +28.8%），記憶體大擴產與先進封裝帶動的廠務建置潮已進入收割期。2Q26 毛利率將因中國案占比拉高而降溫（中信估 27.5%），但 3Q26 起台灣區高毛利案放量，營運可望逐季走高。</p>
+<div class="callout key">
+<span class="ct">投資建議：維持買進（Buy），但區分時間尺度與進場紀律</span>
+<ul>
+<li><strong>12 個月中性目標 302 元</strong>（PE 17x × 2026E EPS 17.77）；機率加權期望目標約 297 元</li>
+<li><strong>12-18 個月樂觀目標 400 元</strong>（中信，PE 17x × 2027E EPS 23.55），須 2027 年業績逐步兌現</li>
+<li>現價 266 元已達保守目標價、季線乖離 +13%，<strong>追價的風報比僅 1.2:1（中性目標對季線停損），不支持現價重倉</strong>；建議輕倉試單、主力部位等回檔至 250-260 元佈局，跌破季線 235 元停損</li>
+<li>後續最關鍵驗證點：<strong>2026/08 中旬 2Q26 財報的毛利率</strong>與月營收對 27.7 億單季預估的兌現程度</li>
+</ul>
+</div>
+<footer class="fin">
+本報告僅供參考，不構成投資建議。<br>
+最後更新：2026-06-10（已納入中信 2026/06/10 報告、1Q26 財報、2026 年前 5 月營收；風報比與進出場架構全面重建）
+</footer>
+</section>
+
+</main>
+</div>
+
+<button id="topBtn" aria-label="回到頂部" title="回到頂部">↑</button>
+
+<script>
+(function(){
+  // 由各 section 的 data-title 自動生成桌機側欄與行動版目錄
+  var sections=document.querySelectorAll("section.card[id]");
+  var toc=document.getElementById("toc"), mlinks=document.getElementById("mlinks"), mnav=document.getElementById("mnav");
+  sections.forEach(function(s){
+    var t=s.getAttribute("data-title")||s.id;
+    var a=document.createElement("a"); a.href="#"+s.id; a.textContent=t; toc.appendChild(a);
+    var m=a.cloneNode(true); mlinks.appendChild(m);
+    m.addEventListener("click",function(){ mnav.removeAttribute("open"); });
+  });
+  // 捲動時側欄高亮目前章節
+  if("IntersectionObserver" in window){
+    var links=toc.querySelectorAll("a");
+    var map={};
+    links.forEach(function(a){ map[a.getAttribute("href").slice(1)]=a; });
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.classList.remove("active")});
+          var a=map[e.target.id]; if(a){a.classList.add("active")}
+        }
+      });
+    },{rootMargin:"-15% 0px -70% 0px"});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+  // 回到頂部按鈕
+  var btn=document.getElementById("topBtn");
+  window.addEventListener("scroll",function(){
+    btn.classList.toggle("show",window.scrollY>600);
+  },{passive:true});
+  btn.addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); });
+})();
+</script>
+</body>
+</html>
