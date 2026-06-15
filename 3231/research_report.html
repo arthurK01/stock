@@ -1,0 +1,1304 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3231 緯創深度研究報告</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --surface-soft: #eef4f5;
+      --ink: #18232e;
+      --muted: #5f6f7d;
+      --line: #dce5ea;
+      --teal: #1d7f78;
+      --teal-dark: #115e59;
+      --blue: #2563a9;
+      --amber: #c47b12;
+      --red: #be3a34;
+      --green: #23824e;
+      --violet: #6d5abf;
+      --shadow: 0 18px 45px rgba(24, 35, 46, .08);
+      --radius: 8px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", Arial, sans-serif;
+      line-height: 1.62;
+      letter-spacing: 0;
+    }
+
+    img,
+    svg {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      color: #f8fbfc;
+      background:
+        linear-gradient(135deg, rgba(14, 47, 61, .94), rgba(17, 94, 89, .88)),
+        url("trend_chart.png") center / cover;
+      border-bottom: 1px solid rgba(255, 255, 255, .16);
+    }
+
+    .hero-inner {
+      width: min(var(--max), calc(100% - 48px));
+      min-height: 430px;
+      margin: 0 auto;
+      padding: 44px 0 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(310px, .65fr);
+      gap: 34px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #bde9e5;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+      font-size: clamp(36px, 5vw, 66px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 18px;
+      font-size: 28px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin-bottom: 24px;
+      color: #e6f1f1;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, .24);
+      border-radius: 999px;
+      color: #eefafa;
+      background: rgba(255, 255, 255, .09);
+      font-size: 14px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-panel {
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: var(--radius);
+      background: rgba(6, 25, 34, .62);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, .24);
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-panel .label {
+      color: #addbd8;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero-price {
+      margin: 4px 0 10px;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .hero-targets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .hero-targets div {
+      padding: 12px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .09);
+    }
+
+    .hero-targets strong {
+      display: block;
+      color: #fff;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .hero-targets span {
+      color: #c7e3e1;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(246, 248, 251, .92);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .nav a {
+      flex: 0 0 auto;
+      padding: 13px 12px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+    }
+
+    .nav a:hover {
+      color: var(--teal-dark);
+      border-bottom-color: var(--teal);
+    }
+
+    main {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      padding: 30px 0 56px;
+    }
+
+    .section {
+      margin: 26px 0;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      scroll-margin-top: 76px;
+    }
+
+    .section-muted {
+      background: var(--surface-soft);
+    }
+
+    .section-head {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .section-head p {
+      max-width: 680px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: #dff1ef;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .metric .name {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .metric .value {
+      margin-top: 8px;
+      font-size: 28px;
+      font-weight: 850;
+      line-height: 1.1;
+    }
+
+    .metric .note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .panel h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel h3::before {
+      content: "";
+      width: 9px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--teal);
+    }
+
+    .panel p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .thesis-list {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .thesis-list li {
+      padding: 16px 16px 16px 18px;
+      border-left: 4px solid var(--teal);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: #f7fbfb;
+    }
+
+    .thesis-list strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+    }
+
+    .chart-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .chart-title span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chart-card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .chart-card svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+      border-radius: 2px;
+      vertical-align: -1px;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 11px;
+      margin-top: 14px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr) 66px;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .track {
+      position: relative;
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e5edf1;
+    }
+
+    .fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--w);
+      border-radius: 999px;
+      background: var(--c, var(--teal));
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #314250;
+      background: #edf4f6;
+      font-size: 13px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td strong {
+      color: var(--ink);
+    }
+
+    .good {
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    .warn {
+      color: var(--amber);
+      font-weight: 850;
+    }
+
+    .bad {
+      color: var(--red);
+      font-weight: 850;
+    }
+
+    .callout {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--amber);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: #fff7e9;
+      color: #5c4321;
+      font-size: 14px;
+    }
+
+    .image-panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .image-panel img {
+      width: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      background: #fff;
+    }
+
+    .image-caption {
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      border-top: 1px solid var(--line);
+    }
+
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .strategy {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .strategy strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .strategy dl {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 8px 10px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .strategy dt {
+      color: #344655;
+      font-weight: 850;
+    }
+
+    .strategy dd {
+      margin: 0;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .timeline time {
+      color: var(--teal-dark);
+      font-weight: 900;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .checklist ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .footer {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      padding: 0 0 44px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 34px;
+      }
+
+      .metrics,
+      .grid-3,
+      .strategy-grid,
+      .checklist {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        background:
+          linear-gradient(180deg, rgba(14, 47, 61, .96), rgba(17, 94, 89, .9)),
+          url("trend_chart.png") center top / auto 62%;
+      }
+
+      .hero-inner,
+      main,
+      .nav,
+      .footer {
+        width: min(100% - 28px, var(--max));
+      }
+
+      .hero-inner {
+        gap: 22px;
+        padding: 28px 0 22px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      h2 {
+        font-size: 23px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .hero-panel {
+        padding: 15px;
+      }
+
+      .hero-targets,
+      .metrics,
+      .grid-3,
+      .strategy-grid,
+      .checklist {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        margin: 18px 0;
+        padding: 20px 16px;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .tag {
+        margin-bottom: 10px;
+      }
+
+      .metric .value {
+        font-size: 25px;
+      }
+
+      .chart-card,
+      .panel,
+      .strategy {
+        padding: 16px;
+      }
+
+      .bar-row {
+        grid-template-columns: 68px minmax(0, 1fr) 56px;
+        gap: 8px;
+      }
+
+      .timeline li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      table {
+        min-width: 680px;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        padding: 10px 11px;
+      }
+
+      .nav a {
+        padding: 11px 10px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">3231 Wistron 深度研究報告｜2026-06-14</p>
+        <h1>緯創：AI 機櫃高成長，估值折價提供賠率</h1>
+        <p class="lead">報告維持「買進」評等，但操作轉為防守與分批佈局：GB 機櫃出貨上修、一般伺服器需求回溫、VR 與 CPO 網通接棒；近期籌碼轉弱（法人賣超、動能評分降至 1/5），風險集中在毛利率稀釋、buy-and-sell 利息費用與客戶集中。</p>
+        <div class="hero-actions">
+          <span class="pill">評等：買進（防守框架）</span>
+          <span class="pill">動能/籌碼：1/5</span>
+          <span class="pill">2026 EPS：14.52 - 14.85 元</span>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="核心數據">
+        <div class="label">最新股價</div>
+        <div class="hero-price">NT$156.0</div>
+        <div class="label">2026-06-12 收盤 TWSE MIS，單日 +2.30%</div>
+        <div class="hero-targets">
+          <div>
+            <span>中性目標</span>
+            <strong>203</strong>
+          </div>
+          <div>
+            <span>樂觀目標</span>
+            <strong>240</strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <div class="nav-wrap">
+    <nav class="nav" aria-label="報告章節">
+      <a href="#summary">摘要</a>
+      <a href="#thesis">投資論點</a>
+      <a href="#valuation">估值與風報比</a>
+      <a href="#financials">財務</a>
+      <a href="#chips">籌碼</a>
+      <a href="#risk">風險</a>
+      <a href="#actions">策略</a>
+      <a href="#calendar">事件</a>
+    </nav>
+  </div>
+
+  <main>
+    <section class="section" id="summary">
+      <div class="section-head">
+        <div>
+          <span class="tag">Executive Snapshot</span>
+          <h2>投資結論</h2>
+          <p>中性目標價 203 元對應 30.1% 上檔；停損採基本面底 135 元（季線下緣），波段中性風報比 2.24 : 1。樂觀目標 240 元的可信度取決於 2027 年 CPO、AMD Helios、VR 三條成長線能見度。</p>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <article class="metric">
+          <div class="name">上檔空間</div>
+          <div class="value good">+30.1%</div>
+          <div class="note">現價至中性目標 203 元</div>
+        </article>
+        <article class="metric">
+          <div class="name">下檔風險</div>
+          <div class="value bad">-13.5%</div>
+          <div class="note">現價至基本面底 135 元</div>
+        </article>
+        <article class="metric">
+          <div class="name">目前 PE</div>
+          <div class="value">10.74x</div>
+          <div class="note">156.0 / 2026E EPS 14.52</div>
+        </article>
+        <article class="metric">
+          <div class="name">核心信心</div>
+          <div class="value">7.3/10</div>
+          <div class="note">偏誤檢核後的綜合評分</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-muted" id="thesis">
+      <div class="section-head">
+        <div>
+          <span class="tag">Investment Thesis</span>
+          <h2>四個核心論點</h2>
+        </div>
+        <p>成長動能明確，但投資重點不只看營收，還要確認毛利率與業外利息是否能被高毛利產品線抵消。</p>
+      </div>
+
+      <div class="grid-2">
+        <ul class="thesis-list">
+          <li>
+            <strong>AI 機櫃出貨爆發</strong>
+            GB 系列機櫃出貨預估由 1.2 萬櫃上修至 1.4 萬-1.8 萬櫃，緯創作為主要代工夥伴直接受惠。
+          </li>
+          <li>
+            <strong>一般伺服器需求共振</strong>
+            Agentic AI 帶動 CPU 運算需求回溫，一般伺服器年增率上修至 12%，並可緩衝 AI 機櫃毛利率稀釋。
+          </li>
+          <li>
+            <strong>VR 產品結構改善</strong>
+            Vera Rubin 平台減少線材組裝，若 3Q26 至 1H27 順利爬坡，ASP 與毛利率均有改善空間。
+          </li>
+          <li>
+            <strong>CPO 網通接棒</strong>
+            網通產品基期低，CPO 交換機組裝業務有望在 2026 年迎來 10 倍成長，毛利率優於 PC 與 AI 伺服器。
+          </li>
+        </ul>
+
+        <div class="image-panel">
+          <img src="trend_chart.png" alt="緯創近六個月股價走勢圖">
+          <div class="image-caption">近六個月股價走勢圖，來源為原研究資料夾內 trend_chart.png。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="valuation">
+      <div class="section-head">
+        <div>
+          <span class="tag">Valuation</span>
+          <h2>估值、價位與風險報酬</h2>
+        </div>
+        <p>中性目標 203 元立足 2026 年 EPS；樂觀目標 240 元主要來自估值基準延伸到 2027 年，需搭配後續基本面驗證。</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>價位地圖</h3>
+            <span>NT$140 - 240</span>
+          </div>
+          <svg viewBox="0 0 720 280" role="img" aria-label="支撐、現價、壓力與目標價區間圖">
+            <line x1="55" y1="170" x2="666" y2="170" stroke="#d7e2e8" stroke-width="12" stroke-linecap="round"/>
+            <line x1="215" y1="170" x2="666" y2="170" stroke="#bcdedb" stroke-width="12" stroke-linecap="round"/>
+            <g font-family="Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+              <g transform="translate(55,170)">
+                <line y1="-48" y2="26" stroke="#be3a34" stroke-width="2"/>
+                <circle r="8" fill="#be3a34"/>
+                <text y="-58" fill="#be3a34">停損 135</text>
+                <text y="48" fill="#5f6f7d">基本面底</text>
+              </g>
+              <g transform="translate(130,170)">
+                <line y1="-34" y2="42" stroke="#c47b12" stroke-width="2"/>
+                <circle r="7" fill="#c47b12"/>
+                <text y="-44" fill="#c47b12">季線 142.28</text>
+                <text y="60" fill="#5f6f7d">支撐/觀察</text>
+              </g>
+              <g transform="translate(215,170)">
+                <line y1="-70" y2="28" stroke="#1d7f78" stroke-width="3"/>
+                <circle r="10" fill="#1d7f78"/>
+                <text y="-82" fill="#1d7f78">現價 156.0</text>
+                <text y="52" fill="#5f6f7d">月線 156.48 貼合</text>
+              </g>
+              <g transform="translate(400,170)">
+                <line y1="-42" y2="26" stroke="#6d5abf" stroke-width="2"/>
+                <circle r="8" fill="#6d5abf"/>
+                <text y="-52" fill="#6d5abf">壓力 191</text>
+                <text y="48" fill="#5f6f7d">前波高點</text>
+              </g>
+              <g transform="translate(480,170)">
+                <line y1="-70" y2="28" stroke="#2563a9" stroke-width="3"/>
+                <circle r="10" fill="#2563a9"/>
+                <text y="-82" fill="#2563a9">中性 203</text>
+                <text y="52" fill="#5f6f7d">+30.1%</text>
+              </g>
+              <g transform="translate(666,170)">
+                <line y1="-70" y2="28" stroke="#23824e" stroke-width="3"/>
+                <circle r="10" fill="#23824e"/>
+                <text y="-82" fill="#23824e">樂觀 240</text>
+                <text y="52" fill="#5f6f7d">+53.8%</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>同業 PE 對比</h3>
+            <span>2026F</span>
+          </div>
+          <div class="bar-list" aria-label="同業本益比長條圖">
+            <div class="bar-row">
+              <span>緯創</span>
+              <div class="track"><span class="fill" style="--w:57%;--c:#1d7f78"></span></div>
+              <span>10.74x</span>
+            </div>
+            <div class="bar-row">
+              <span>廣達</span>
+              <div class="track"><span class="fill" style="--w:88%;--c:#2563a9"></span></div>
+              <span>16.50x</span>
+            </div>
+            <div class="bar-row">
+              <span>鴻海</span>
+              <div class="track"><span class="fill" style="--w:100%;--c:#6d5abf"></span></div>
+              <span>18.68x</span>
+            </div>
+            <div class="bar-row">
+              <span>緯穎</span>
+              <div class="track"><span class="fill" style="--w:91%;--c:#c47b12"></span></div>
+              <span>17.07x</span>
+            </div>
+          </div>
+          <div class="callout">緯創目前 PE 明顯低於同業，折價主因是未直接面對 CSP、毛利率薄與 buy-and-sell 資金壓力。</div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:18px;">
+        <table>
+          <thead>
+            <tr>
+              <th>維度</th>
+              <th>進場 → 目標</th>
+              <th>進場 → 停損</th>
+              <th>空間</th>
+              <th>風險報酬比</th>
+              <th>評價</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>技術防守（中性）</strong></td>
+              <td>156.0 → 203.0</td>
+              <td>季線 142.28</td>
+              <td class="good">+30.1% / -8.8%</td>
+              <td><strong>3.43 : 1</strong></td>
+              <td>僅在季線守住時成立</td>
+            </tr>
+            <tr>
+              <td><strong>波段基本面（中性）</strong></td>
+              <td>156.0 → 203.0</td>
+              <td>基本面底 135.0</td>
+              <td class="good">+30.1% / -13.5%</td>
+              <td><strong>2.24 : 1</strong></td>
+              <td>穩健</td>
+            </tr>
+            <tr>
+              <td><strong>波段基本面（樂觀）</strong></td>
+              <td>156.0 → 240.0</td>
+              <td>基本面底 135.0</td>
+              <td class="good">+53.8% / -13.5%</td>
+              <td><strong>4.00 : 1</strong></td>
+              <td>優良</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">季線 142.28 元僅距現價 8.8%，對高 beta 股屬過緊停損，正常震盪即易被掃出；波段持有改採容納 overshoot 的基本面底 135 元，風報比由 3.43 降至較誠實的 2.24（中性）。極端戴維斯雙殺可下探 103 元。</div>
+    </section>
+
+    <section class="section section-muted" id="financials">
+      <div class="section-head">
+        <div>
+          <span class="tag">Financials</span>
+          <h2>財務趨勢與情境</h2>
+        </div>
+        <p>營收高速擴張，EPS 也明顯上行；但毛利率由 FY23/FY24 的 8.0% 下滑至 FY26F 的 5.9%，需觀察 2H26 高毛利產品是否接棒。</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>營收與 EPS 趨勢</h3>
+            <span>FY23 - FY27F</span>
+          </div>
+          <svg viewBox="0 0 720 360" role="img" aria-label="營收與 EPS 趨勢圖">
+            <line x1="58" y1="300" x2="682" y2="300" stroke="#dce5ea"/>
+            <line x1="58" y1="70" x2="58" y2="300" stroke="#dce5ea"/>
+            <g font-family="Arial, sans-serif" font-size="12" fill="#5f6f7d">
+              <text x="44" y="304" text-anchor="end">0</text>
+              <text x="44" y="247" text-anchor="end">1T</text>
+              <text x="44" y="190" text-anchor="end">2T</text>
+              <text x="44" y="133" text-anchor="end">3T</text>
+              <text x="44" y="76" text-anchor="end">4T+</text>
+            </g>
+            <g font-family="Arial, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+              <rect x="92" y="251" width="52" height="49" fill="#8fc6c2"/>
+              <rect x="216" y="240" width="52" height="60" fill="#6fb1ad"/>
+              <rect x="340" y="175" width="52" height="125" fill="#3d9891"/>
+              <rect x="464" y="102" width="52" height="198" fill="#1d7f78"/>
+              <rect x="588" y="56" width="52" height="244" fill="#115e59"/>
+              <text x="118" y="325" fill="#314250">FY23</text>
+              <text x="242" y="325" fill="#314250">FY24</text>
+              <text x="366" y="325" fill="#314250">FY25</text>
+              <text x="490" y="325" fill="#314250">FY26F</text>
+              <text x="614" y="325" fill="#314250">FY27F</text>
+            </g>
+            <polyline points="118,251 242,225 366,181 490,124 614,82" fill="none" stroke="#c47b12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <g fill="#c47b12" stroke="#fff" stroke-width="3">
+              <circle cx="118" cy="251" r="7"/>
+              <circle cx="242" cy="225" r="7"/>
+              <circle cx="366" cy="181" r="7"/>
+              <circle cx="490" cy="124" r="7"/>
+              <circle cx="614" cy="82" r="7"/>
+            </g>
+            <g font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#5f6f7d" text-anchor="middle">
+              <text x="118" y="238">EPS 4.08</text>
+              <text x="242" y="212">6.11</text>
+              <text x="366" y="168">9.04</text>
+              <text x="490" y="111">14.52</text>
+              <text x="614" y="69">17.25</text>
+            </g>
+          </svg>
+          <div class="legend">
+            <span><i style="background:#1d7f78"></i>營收長條</span>
+            <span><i style="background:#c47b12"></i>EPS 折線</span>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>情境目標價</h3>
+            <span>機率加權</span>
+          </div>
+          <svg viewBox="0 0 720 360" role="img" aria-label="樂觀、中性、保守情境與目標價">
+            <g font-family="Arial, sans-serif">
+              <rect x="72" y="76" width="170" height="184" rx="8" fill="#e8f5f2" stroke="#b7dcd7"/>
+              <rect x="274" y="46" width="170" height="214" rx="8" fill="#eef2fb" stroke="#cbd7ef"/>
+              <rect x="476" y="138" width="170" height="122" rx="8" fill="#fff0df" stroke="#efd4ac"/>
+              <text x="157" y="111" text-anchor="middle" font-size="18" font-weight="800" fill="#115e59">中性</text>
+              <text x="359" y="82" text-anchor="middle" font-size="18" font-weight="800" fill="#2563a9">樂觀</text>
+              <text x="561" y="174" text-anchor="middle" font-size="18" font-weight="800" fill="#9a5a0b">保守</text>
+              <text x="157" y="150" text-anchor="middle" font-size="42" font-weight="850" fill="#115e59">203</text>
+              <text x="359" y="121" text-anchor="middle" font-size="42" font-weight="850" fill="#2563a9">240</text>
+              <text x="561" y="213" text-anchor="middle" font-size="42" font-weight="850" fill="#9a5a0b">145</text>
+              <text x="157" y="184" text-anchor="middle" font-size="15" font-weight="700" fill="#5f6f7d">機率 50%</text>
+              <text x="359" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#5f6f7d">機率 30%</text>
+              <text x="561" y="247" text-anchor="middle" font-size="15" font-weight="700" fill="#5f6f7d">機率 20%</text>
+              <line x1="72" y1="300" x2="646" y2="300" stroke="#dce5ea"/>
+              <text x="72" y="326" font-size="13" fill="#5f6f7d">目標價單位：NT$</text>
+            </g>
+          </svg>
+          <div class="callout">保守情境來自研究者 overlay：PC/NB 衰退超預期與利息侵蝕，使 2026 EPS 降至 11.0 - 12.0 元。</div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:18px;">
+        <table>
+          <thead>
+            <tr>
+              <th>年度</th>
+              <th>營業收入 (百萬)</th>
+              <th>營業利益 (百萬)</th>
+              <th>稅後純益 (百萬)</th>
+              <th>EPS</th>
+              <th>毛利率</th>
+              <th>ROE</th>
+              <th>自由現金流 (百萬)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>FY23</strong></td><td>867,057</td><td>27,390</td><td>11,472</td><td>4.08</td><td>8.0%</td><td>11.4%</td><td class="good">33,554</td></tr>
+            <tr><td><strong>FY24</strong></td><td>1,049,256</td><td>38,979</td><td>17,446</td><td>6.11</td><td>8.0%</td><td>14.7%</td><td class="bad">-14,344</td></tr>
+            <tr><td><strong>FY25</strong></td><td>2,186,523</td><td>78,553</td><td>27,408</td><td>9.04</td><td>6.1%</td><td>17.7%</td><td class="bad">-149,323</td></tr>
+            <tr><td><strong>FY26F</strong></td><td>3,461,938</td><td>126,677</td><td>45,665</td><td>14.52</td><td>5.9%</td><td>17.1%</td><td class="bad">-17,568</td></tr>
+            <tr><td><strong>FY27F</strong></td><td>4,592,664</td><td>128,136</td><td>54,239</td><td>17.25</td><td>5.0%</td><td>18.3%</td><td class="good">23,651</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="chips">
+      <div class="section-head">
+        <div>
+          <span class="tag">Chip Data</span>
+          <h2>籌碼與動能</h2>
+        </div>
+        <p>千張大戶比例單週由 61.68% 回吐至 60.64%（-1.04%），法人近五日累計賣超 48,685 張。融券餘額低，報告明確不以軋空描述。</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>集保千張大戶比例</h3>
+            <span>近 4 週</span>
+          </div>
+          <svg viewBox="0 0 720 320" role="img" aria-label="千張大戶持股比例趨勢">
+            <line x1="62" y1="260" x2="660" y2="260" stroke="#dce5ea"/>
+            <line x1="62" y1="70" x2="62" y2="260" stroke="#dce5ea"/>
+            <polyline points="110,231 268,202 426,135 584,155" fill="none" stroke="#1d7f78" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g fill="#1d7f78" stroke="#fff" stroke-width="3">
+              <circle cx="110" cy="231" r="8"/>
+              <circle cx="268" cy="202" r="8"/>
+              <circle cx="426" cy="135" r="8"/>
+              <circle cx="584" cy="155" r="8" fill="#be3a34"/>
+            </g>
+            <g font-family="Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#314250">
+              <text x="110" y="286">5/22</text>
+              <text x="268" y="286">5/29</text>
+              <text x="426" y="286">6/05</text>
+              <text x="584" y="286">6/12</text>
+              <text x="110" y="216">56.70%</text>
+              <text x="268" y="187">58.18%</text>
+              <text x="426" y="119">61.68%</text>
+              <text x="584" y="140" fill="#be3a34">60.64%</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">
+            <h3>三大法人近 5 日累計</h3>
+            <span>張數</span>
+          </div>
+          <div class="bar-list">
+            <div class="bar-row">
+              <span>外資</span>
+              <div class="track"><span class="fill" style="--w:74%;--c:#be3a34"></span></div>
+              <span class="bad">-36,018</span>
+            </div>
+            <div class="bar-row">
+              <span>投信</span>
+              <div class="track"><span class="fill" style="--w:22%;--c:#c47b12"></span></div>
+              <span class="bad">-10,595</span>
+            </div>
+            <div class="bar-row">
+              <span>自營</span>
+              <div class="track"><span class="fill" style="--w:4%;--c:#6d5abf"></span></div>
+              <span class="bad">-2,071</span>
+            </div>
+            <div class="bar-row">
+              <span>合計</span>
+              <div class="track"><span class="fill" style="--w:100%;--c:#be3a34"></span></div>
+              <span class="bad">-48,685</span>
+            </div>
+          </div>
+          <div class="callout">動能/籌碼評分降至 1/5：千張大戶單週回吐、外資與投信同步賣超、股價跌破月線；券資比僅約 1.0% - 1.3%，無軋空條件。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-muted" id="risk">
+      <div class="section-head">
+        <div>
+          <span class="tag">Risk</span>
+          <h2>風險矩陣與賣出劇本</h2>
+        </div>
+        <p>這份報告的關鍵紀律是「營收高成長不能自動等於 EPS 高成長」。毛利率、利息支出與自由現金流是後續追蹤重點。</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="panel">
+          <h3>毛利率稀釋</h3>
+          <p>1Q26 毛利率降至 5.2%。GB 機櫃營收高但毛利較低，若 2Q26 未止跌，估值重估會受限。</p>
+          <strong class="bad">風險：高</strong>
+        </div>
+        <div class="panel">
+          <h3>業外利息</h3>
+          <p>buy-and-sell 模式推高流動負債，1Q26 業外淨支出達 -56.3 億元，須看逐季收斂。</p>
+          <strong class="bad">風險：高</strong>
+        </div>
+        <div class="panel">
+          <h3>客戶集中</h3>
+          <p>獲利高度綁定 NVIDIA GB/VR roadmap；架構改變、多源化或價格戰都會壓縮利潤。</p>
+          <strong class="bad">風險：高</strong>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:18px;">
+        <table>
+          <thead>
+            <tr>
+              <th>賣出觸發條件</th>
+              <th>原因</th>
+              <th>建議反應</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>連續兩季毛利率低於 5.0%</strong></td>
+              <td>表示高毛利產品無法抵消機櫃稀釋</td>
+              <td>減碼並重估 EPS</td>
+            </tr>
+            <tr>
+              <td><strong>單季業外淨支出超過 70 億</strong></td>
+              <td>利息侵蝕開始吞噬 AI 獲利</td>
+              <td>降低持股權重</td>
+            </tr>
+            <tr>
+              <td><strong>GB 機櫃季出貨低於 3,500 櫃</strong></td>
+              <td>跌破 1Q26 水準，出貨上修論點失效</td>
+              <td>取消樂觀情境</td>
+            </tr>
+            <tr>
+              <td><strong>季度營收 YoY 跌破 +40%</strong></td>
+              <td>排除基期效應後的結構性走弱（單月 YoY 因 2025 高基期失真）</td>
+              <td>減碼</td>
+            </tr>
+            <tr>
+              <td><strong>有效收盤跌破基本面底 135.00 元</strong></td>
+              <td>季線下緣失守，中期防線破壞</td>
+              <td>全數停損</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="actions">
+      <div class="section-head">
+        <div>
+          <span class="tag">Action Plan</span>
+          <h2>操作框架</h2>
+        </div>
+        <p>因動能/籌碼評分降至 1/5，動能型追價已暫停。現階段以積極型（小倉建立）與穩健型（回檔分批）為主，停損統一採基本面底 135 元。</p>
+      </div>
+
+      <div class="strategy-grid">
+        <article class="strategy">
+          <strong>積極型</strong>
+          <dl>
+            <dt>進場</dt><dd>現價附近 156.0 元</dd>
+            <dt>停損</dt><dd>基本面底 135 元</dd>
+            <dt>目標</dt><dd>中性 203 元</dd>
+            <dt>風報比</dt><dd>2.24 : 1</dd>
+          </dl>
+        </article>
+        <article class="strategy">
+          <strong>穩健型</strong>
+          <dl>
+            <dt>進場</dt><dd>回檔 148 - 150 元</dd>
+            <dt>停損</dt><dd>基本面底 135 元</dd>
+            <dt>目標</dt><dd>中性 203 元</dd>
+            <dt>風報比</dt><dd>3.53 : 1</dd>
+          </dl>
+        </article>
+        <article class="strategy">
+          <strong>動能型（已暫停）</strong>
+          <dl>
+            <dt>狀態</dt><dd>籌碼評分 1/5，失效</dd>
+            <dt>重啟</dt><dd>評分回升至 3 分以上</dd>
+            <dt>門檻</dt><dd>放量站上 191 元</dd>
+            <dt>風報比</dt><dd>暫不適用</dd>
+          </dl>
+        </article>
+      </div>
+
+      <div class="checklist" style="margin-top:18px;">
+        <div class="panel">
+          <h3>進場前檢查</h3>
+          <ul>
+            <li>季度營收 YoY 維持高成長（單月受 2025 高基期失真，5 月 +39.24%）。</li>
+            <li>GB 機櫃能見度維持 1.4 萬-1.8 萬櫃。</li>
+            <li>Fwd PE 維持低於同業 16x - 18x。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>持有中監控</h3>
+          <ul>
+            <li>2Q26 毛利率是否高於 5.2%（8/14 季報）。</li>
+            <li>業外利息支出是否低於 56 億元並逐季收斂。</li>
+            <li>法人賣超是否止穩、千張大戶是否回流。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-muted" id="calendar">
+      <div class="section-head">
+        <div>
+          <span class="tag">Calendar</span>
+          <h2>關鍵事件</h2>
+        </div>
+        <p>後續驗證集中在短期營收、中期毛利率與 3Q26 產品爬坡。</p>
+      </div>
+
+      <ol class="timeline">
+        <li>
+          <time>2026.06.10</time>
+          <div><strong>5 月合併營收（已公告）</strong>：2,901.83 億元、YoY +39.24%（高基期），單月歷史次高。</div>
+        </li>
+        <li>
+          <time>2026.08.14</time>
+          <div><strong>2Q26 季報</strong>：觀察毛利率是否如富邦預期不再被稀釋。</div>
+        </li>
+        <li>
+          <time>3Q26</time>
+          <div><strong>VR 專案爬坡量產</strong>：確認產品結構改善能否拉動毛利率。</div>
+        </li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>資料來源：3231_緯創/research_notes.md（2026-06-14 修訂版）與同資料夾圖檔 trend_chart.png。此頁為研究資料視覺化，不構成個別投資建議。</p>
+  </footer>
+</body>
+</html>
