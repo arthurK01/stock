@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>京鼎 (3413) 深度研究報告</title>
+<style>
+  :root{
+    --bg:#eef1f5; --card:#ffffff; --ink:#1c2630; --muted:#5c6b7a; --line:#e2e7ee;
+    --brand:#15324d; --brand2:#24557f; --chip:#eaf1f8;
+    --up:#d63031; --up-bg:#fdecec; --down:#0f9d58; --down-bg:#e7f6ee;
+    --neutral:#6b7686; --neutral-bg:#eef1f5; --warn:#b8860b; --warn-bg:#fcf6e6;
+    --radius:14px; --shadow:0 1px 3px rgba(20,40,60,.07),0 6px 20px rgba(20,40,60,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1620; --card:#18222e; --ink:#e6edf4; --muted:#9fb0c0; --line:#26333f;
+      --brand:#0c1c2c; --brand2:#3b78a8; --chip:#1f2c3a;
+      --up:#ff6b6b; --up-bg:#2a1a1c; --down:#2ec27e; --down-bg:#13251c;
+      --neutral:#9fb0c0; --neutral-bg:#1f2c3a; --warn:#e3b341; --warn-bg:#2a2415;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC","Segoe UI",system-ui,sans-serif;
+    line-height:1.7; -webkit-text-size-adjust:100%; font-size:clamp(15px,1.6vw,16.5px);
+  }
+  a{color:var(--brand2);text-decoration:none}
+  /* ---------- Header ---------- */
+  header.top{
+    background:linear-gradient(135deg,var(--brand),var(--brand2));
+    color:#fff; padding:22px clamp(16px,4vw,40px);
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  .tag{display:inline-block;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-bottom:6px}
+  header.top h1{margin:0;font-size:clamp(1.4rem,4.5vw,2.1rem);font-weight:800;letter-spacing:.01em}
+  header.top .sub{opacity:.9;margin-top:4px;font-size:.92rem}
+  .metrics{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .metric{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 14px;backdrop-filter:blur(4px)}
+  .metric b{display:block;font-size:1.12rem;font-weight:800;line-height:1.2}
+  .metric span{font-size:.72rem;opacity:.85}
+  /* ---------- Nav ---------- */
+  nav.bar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  nav.bar .wrap{display:flex;gap:4px;overflow-x:auto;padding:8px clamp(12px,3vw,40px);scrollbar-width:thin}
+  nav.bar a{flex:0 0 auto;padding:7px 13px;border-radius:999px;color:var(--muted);font-size:.86rem;font-weight:600;white-space:nowrap}
+  nav.bar a.active{background:var(--chip);color:var(--brand2)}
+  /* ---------- Layout ---------- */
+  main{padding:clamp(18px,4vw,34px) clamp(16px,4vw,40px) 60px}
+  section{margin-bottom:34px;scroll-margin-top:64px}
+  h2{font-size:clamp(1.15rem,3vw,1.45rem);font-weight:800;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .n{font-size:.8rem;background:var(--brand);color:#fff;border-radius:8px;padding:3px 9px;font-weight:700;flex:0 0 auto}
+  .lead{color:var(--muted);margin:2px 0 16px;font-size:.95rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(16px,3vw,22px);margin-bottom:16px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:780px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  /* ---------- Callout ---------- */
+  .callout{border-left:5px solid var(--brand2);background:var(--chip);border-radius:10px;padding:14px 16px;margin:14px 0}
+  .callout.key{border-color:var(--warn);background:var(--warn-bg)}
+  .callout h3{margin:0 0 6px;font-size:1rem}
+  .callout p{margin:6px 0}
+  /* ---------- Tables ---------- */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9rem}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  thead th{background:var(--neutral-bg);font-weight:700;color:var(--ink);position:sticky;top:0}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--chip)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .up{color:var(--up);font-weight:700}
+  .down{color:var(--down);font-weight:700}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:700}
+  .pill.buy{background:var(--up-bg);color:var(--up)}
+  .pill.ow{background:var(--warn-bg);color:var(--warn)}
+  .pill.neu{background:var(--neutral-bg);color:var(--neutral)}
+  /* ---------- Scenario cards ---------- */
+  .scn{border-radius:12px;padding:16px;border:1px solid var(--line)}
+  .scn.bull{background:var(--up-bg);border-color:var(--up)}
+  .scn.base{background:var(--neutral-bg);border-color:var(--neutral)}
+  .scn.bear{background:var(--down-bg);border-color:var(--down)}
+  .scn .lbl{font-weight:800;font-size:.95rem;margin-bottom:8px}
+  .scn.bull .lbl{color:var(--up)} .scn.base .lbl{color:var(--neutral)} .scn.bear .lbl{color:var(--down)}
+  .scn .big{font-size:1.5rem;font-weight:800;line-height:1.1}
+  .scn ul{margin:8px 0 0;padding-left:18px;font-size:.86rem;color:var(--muted)}
+  .scn ul li{margin:3px 0}
+  /* ---------- misc ---------- */
+  ul.clean{margin:8px 0;padding-left:20px}
+  ul.clean li{margin:6px 0}
+  .stars{color:var(--up);letter-spacing:2px}
+  .muted{color:var(--muted)}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  footer{background:var(--brand);color:#cdd9e4;padding:24px clamp(16px,4vw,40px);font-size:.82rem}
+  footer .wrap{display:flex;flex-direction:column;gap:8px}
+  .disc{opacity:.8;line-height:1.6}
+  .kbadge{display:inline-flex;align-items:center;gap:6px;background:var(--warn-bg);color:var(--warn);font-weight:700;padding:4px 12px;border-radius:999px;font-size:.82rem}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="tag">深度研究報告 · 半導體設備代工</div>
+    <h1>京鼎精密科技 (3413.TW)</h1>
+    <div class="sub">應用材料 (AMAT) 核心設備代工夥伴 · 資料截至 2026/06/17</div>
+    <div class="metrics">
+      <div class="metric"><b>買進</b><span>評等 (買進×3 / 增持×1)</span></div>
+      <div class="metric"><b>NT$370–420</b><span>目標價區間</span></div>
+      <div class="metric"><b>NT$316.0</b><span>現價 (TWSE MIS)</span></div>
+      <div class="metric"><b>12.9–13.8x</b><span>2026 PE</span></div>
+      <div class="metric"><b>10.6–12.1x</b><span>2027 forward PE</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="bar">
+  <div class="wrap" id="nav">
+    <a href="#summary">摘要</a>
+    <a href="#thesis">核心論點</a>
+    <a href="#riskreward">風報比</a>
+    <a href="#valuation">估值拆解</a>
+    <a href="#why">為何便宜</a>
+    <a href="#davis">雙擊／雙殺</a>
+    <a href="#longterm">遠期情境</a>
+    <a href="#ev">期望值與部位</a>
+    <a href="#financials">財務</a>
+    <a href="#technical">技術面</a>
+    <a href="#risks">風險</a>
+    <a href="#brokers">券商彙整</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ===== 摘要 ===== -->
+  <section id="summary">
+    <h2><span class="n">摘要</span>一句話結論</h2>
+    <div class="callout key">
+      <h3><span class="kbadge">⚙ 唯一關鍵變數</span></h3>
+      <p>京鼎的多頭論點完全押在 <b>「泰國新廠毛利率反轉」</b> 這個單一變數。它同時決定：(1) 評價能否 re-rate、(2) 戴維斯雙擊能否啟動、(3) 券商 forward 目標價站不站得住。在 <b>4Q26 至 1Q27 泰國損平被財報證實前</b>，這是一檔「基本面成立、但催化劑未到」的標的——正期望值值得建核心倉，但用催化劑分批、用集中度封頂，不宜重押。</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="muted note">基本面</div><b>站得住買進</b><p class="note">AMAT 上修 FY26 設備成長至高於 30%；訂單能見度 9–12 個月、部分見至 2027 年底；客戶需求預測達 2029 年。</p></div>
+      <div class="card"><div class="muted note">技術面</div><b>高檔糾結 · 利多出盡</b><p class="note">06/17 在四家同步上修下，反自 326.5 量增下殺約 3% 至 316；均線叢集 306–315 收斂待變盤。</p></div>
+      <div class="card"><div class="muted note">風報比（誠實重算）</div><b>中性偏優 ★★★☆</b><p class="note">波段中性約 1.8:1、樂觀 forward 約 2.9:1。原報告 3.05:1 為維度混用，已修正。</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 核心論點 ===== -->
+  <section id="thesis">
+    <h2><span class="n">1</span>核心投資論點</h2>
+    <div class="grid g2">
+      <div class="card"><b>① 大客戶展望強勁上修</b><p class="note">AMAT 5 月法說上修 FY2026 半導體設備業務成長至高於 30%（前估高於 20%），動能延續至 2027 年；其 rolling forecast 已達 2028 年。京鼎佔 AMAT 營收約 8 成，CVD／Etch 代工佔比高於 5 成。</p></div>
+      <div class="card"><b>② 合約負債觸底反彈</b><p class="note">1Q26 合約負債 1.85 億元、季增 60.8%，止步連續七季下滑，確認訂單動能拐點。<span class="muted">（源自 context_data，未經券商獨立交叉驗證，列較低信度。）</span></p></div>
+      <div class="card"><b>③ 泰國產能全球化放量</b><p class="note">春武里廠 3Q26 導入量產；羅勇廠 2Q26「即將／接近損平」。泰國營收佔比目前約 15%，估 2026 年底升至 20–25%、2027 年達 30–40%。損平時程券商分歧：中信估年底、玉山估最遲 1Q27。</p></div>
+      <div class="card"><b>④ 上行週期中評價低估（但有但書）</b><p class="note">2026 PE 約 12.9–13.8x、2027 forward 約 10.6–12.1x，居歷史區間（7–15／16x）中下緣。<b>但</b>四家最新目標皆以 forward 基準推得，當年度看似便宜部分反映市場已用次年定價。</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 風報比 ===== -->
+  <section id="riskreward">
+    <h2><span class="n">2</span>風險報酬比與進出場規畫</h2>
+    <p class="lead">採「同持有期間」雙框架，避免短線停損配長線目標的維度混用。</p>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>框架</th><th>目標</th><th class="num">上檔</th><th>停損</th><th class="num">下檔</th><th class="num">風報比</th></tr></thead>
+        <tbody>
+          <tr><td>波段-中性 (6–12月)</td><td>380</td><td class="num up">+20.3%</td><td>結構低 280</td><td class="num down">-11.4%</td><td class="num">1.78 : 1</td></tr>
+          <tr><td>波段-樂觀 (forward)</td><td>420</td><td class="num up">+32.9%</td><td>結構低 280</td><td class="num down">-11.4%</td><td class="num">2.89 : 1</td></tr>
+          <tr><td>短線-技術 (數日–數週)</td><td>347</td><td class="num up">+9.8%</td><td>叢集下緣 304</td><td class="num down">-3.8%</td><td class="num">2.58 : 1</td></tr>
+          <tr><td>短線-保守</td><td>收復 326.5</td><td class="num up">+3.3%</td><td>叢集下緣 304</td><td class="num down">-3.8%</td><td class="num">0.87 : 1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><p>⚠️ <b>修正說明</b>：原報告 3.05:1 以「短線季線停損 -6.65% 配 12 個月基本面目標 +20.3%」計算，屬不同持有期間混用、且季線數據過時（實際季線約 306 非 295），會高估。已分框架重算。</p></div>
+    <h3 style="margin:18px 0 8px">進場策略（分批綁催化劑）</h3>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>策略</th><th>進場</th><th>停損</th><th>目標</th><th class="num">風報比</th></tr></thead>
+        <tbody>
+          <tr><td>波段分批（核心）</td><td>316 附近 1/2，回測 300–306 加 1/2</td><td>週收破 280（週期紀律）</td><td>380（樂觀 420）</td><td class="num">1.8–2.9 : 1</td></tr>
+          <tr><td>短線動能（條件式）</td><td>帶量站回 326.5 再追</td><td>跌破 304 或進場 -5%</td><td>347</td><td class="num">約 2.0 : 1</td></tr>
+          <tr><td>保守深回</td><td>深殺至 280 附近</td><td>週收破 263.8</td><td>380</td><td class="num">約 2.5 : 1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">籌碼軋空評分 1/5（未達 3）→ 不強制啟動動能框架。在帶量收復 326.5 前短線偏震盪，不宜在 316 追高；逢回測均線叢集 300–306 分批，風報比較佳。</p>
+  </section>
+
+  <!-- ===== 估值拆解 ===== -->
+  <section id="valuation">
+    <h2><span class="n">3</span>四家券商估值三因子拆解</h2>
+    <p class="lead">EPS × 倍數 × 基準年。重點：四家目標價全部建立在 forward（2027 或 2H26-1H27）EPS 上，非當年度。</p>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>券商</th><th>評等</th><th class="num">目標</th><th>基準年(EPS)</th><th class="num">倍數</th><th>維持／上修的真正來源</th></tr></thead>
+        <tbody>
+          <tr><td>中信</td><td><span class="pill buy">買進</span></td><td class="num">420</td><td>2H26-1H27 (約28)</td><td class="num">15x</td><td>EPS 上修＋基準前滾；倍數天花板</td></tr>
+          <tr><td>富邦</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td>2027 (29.94)</td><td class="num">13x</td><td><b>純倍數擴張</b> 12→13x（EPS 沒動）</td></tr>
+          <tr><td>元大</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td>2027 (26.13)</td><td class="num">15x</td><td><b>基準前滾＋倍數抬升，蓋住 EPS 下修 10%</b></td></tr>
+          <tr><td>玉山</td><td><span class="pill ow">增加持股</span></td><td class="num">370</td><td>2027 (26.59)</td><td class="num">14x</td><td>四家最保守</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid g3">
+      <div class="card"><b>換算回 2026 PE 全站歷史高檔</b><p class="note">中信 17.2x／富邦 15.6x／元大 16.6x／玉山 16.1x。目標看似合理全靠 forward 表述；倍數面幾乎沒有安全邊際。</p></div>
+      <div class="card"><b>趨同是假象</b><p class="note">富邦（高 EPS×低倍）與元大（低 EPS×高倍）以相反假設湊到同一個 380，2027 EPS 假設差 14.6%。380–420 不是真共識。</p></div>
+      <div class="card"><b>可信度排序</b><p class="note">中信較紮實 → 玉山保守 → 元大最隱蔽（基準前滾掩蓋 EPS 下修）→ 富邦上修品質最弱（純敘事倍數擴張）。</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 為何便宜 ===== -->
+  <section id="why">
+    <h2><span class="n">4</span>為何「重要供應地位＋產業高成長」卻評價偏低？</h2>
+    <div class="grid g2">
+      <div class="scn bull">
+        <div class="lbl">(A) 可能被過度懲罰 — 機會</div>
+        <p style="margin:6px 0;font-size:.9rem">1Q26 EPS 4.28 元，低於共識 5.78 元達 26%。<b>但本業營益率 13.1% 反而優於預期</b>，miss 全來自線下：</p>
+        <ul>
+          <li>有效稅率飆至 31.9%（泰國廠投入）</li>
+          <li>業外缺乏外幣兌換利益（1Q25 有、1Q26 無）</li>
+          <li>→ 一次性稅率＋匯兌，非需求或毛利惡化，市場可能過度反應</li>
+        </ul>
+      </div>
+      <div class="scn bear">
+        <div class="lbl">(B) 結構性合理折價 — 低倍數主因</div>
+        <ul style="font-size:.9rem">
+          <li><b>代工本質</b>：賺模組代工財（毛利 24–26%），非設備 IP 財（AMAT 約 47%）。比 AMAT／ASML 44–68x 是類別錯置。</li>
+          <li><b>客戶集中</b>：AMAT 約 8 成，單一客戶天花板＝永久折價。</li>
+          <li><b>上行週期中毛利逆行</b>：營收 +19%，但毛利率 26%→24%、淨利率 15.9%→10.5% 跌更快。<b>營收增、EPS 停＝價值陷阱特徵</b>。</li>
+          <li><b>forward 估值被下修</b>：2026 EPS 從 28–30 砍到 23–24（-15~20%）。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><p><b>小結</b>：先進製程高成長是真的，但成長卡在營收層、沒下沉到 EPS。低評價約一成是 Q1 一次性 miss 的過度反應（機會），大半是代工＋客戶集中＋毛利逆行的結構折價（合理）。<b>要真正 re-rate，必須先看到 2027 毛利率反轉，把「營收成長」轉成「EPS 成長」。</b></p></div>
+  </section>
+
+  <!-- ===== 雙擊／雙殺 ===== -->
+  <section id="davis">
+    <h2><span class="n">5</span>戴維斯雙擊／雙殺（近端，2027）</h2>
+    <div class="grid g2">
+      <div class="scn bull">
+        <div class="lbl">▲ 戴維斯雙擊（多）</div>
+        <div class="big up">405 → 478</div>
+        <p class="note" style="margin:4px 0">對現價 +28% ~ +51%</p>
+        <ul>
+          <li>EPS 面：毛利率 24%→25%＋稅率正常化，2027 EPS +14~23%</li>
+          <li>倍數面：13x →（脫離陷阱）15–16x</li>
+          <li>試算：27×15x=405；29.9×16x=478</li>
+        </ul>
+      </div>
+      <div class="scn bear">
+        <div class="lbl">▼ 戴維斯雙殺（空）</div>
+        <div class="big down">231 → 240</div>
+        <p class="note" style="margin:4px 0">對現價 -24% ~ -27%</p>
+        <ul>
+          <li>EPS 面：2026→21、2027→24–25（已示範可砍 15–20%）</li>
+          <li>倍數面：13x → 10–11x（客戶集中恐慌恐更低）</li>
+          <li>試算：21×11x=231；24×10x=240</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><p>⏱ <b>不對稱與時序</b>：倍數壓縮即時反映情緒、EPS 下修要等財報 → <b>雙殺先快後磨，比雙擊先到</b>。雙擊觸發點（泰國損平驗證）要等 4Q26–1Q27；在此之前 play 面啟動不了，而 kill 面已在進行中。這正是「便宜卻卡住」的原因。</p></div>
+  </section>
+
+  <!-- ===== 遠期情境 ===== -->
+  <section id="longterm">
+    <h2><span class="n">6</span>遠期情境估值想像（2028–2030）</h2>
+    <p class="lead">低信度推演。需求有底（客戶預測達 2029、「看不到車尾燈」），變數只剩「蓋多快（產能）＋毛利率反不反轉」。</p>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>情境</th><th>2028 營收</th><th class="num">淨利率</th><th class="num">2028 EPS</th><th class="num">終端倍數</th><th class="num">2028 目標</th><th class="num">對現價</th><th class="num">2030 指示</th></tr></thead>
+        <tbody>
+          <tr><td><span class="up">樂觀（雙擊延伸）</span></td><td>310–330 億</td><td class="num">12–14%</td><td class="num">38–42</td><td class="num">16x (藍天18x)</td><td class="num">約 620 (750)</td><td class="num up">+96% (+137%)</td><td class="num">約 850</td></tr>
+          <tr><td><span class="muted">中性</span></td><td>295–305 億</td><td class="num">11–12%</td><td class="num">30–33</td><td class="num">13–14x</td><td class="num">約 435</td><td class="num up">+38%</td><td class="num">約 530</td></tr>
+          <tr><td><span class="down">悲觀（雙殺／循環）</span></td><td>265–280 億</td><td class="num">9.5–10.5%</td><td class="num">22–24</td><td class="num">9–11x</td><td class="num">約 240</td><td class="num down">-24%</td><td class="num">約 260</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid g3">
+      <div class="card"><b>上檔靠 EPS×時間，非倍數</b><p class="note">樂觀兩年翻倍，倍數僅 13→16x（貢獻 +23%），其餘全靠 EPS 從約 24 翻到約 40 的複利。</p></div>
+      <div class="card"><b>倍數有天花板</b><p class="note">代工＋客戶集中使再評價封頂約 16x；18x 須結構性改變（客戶分散／自研設備 re-rate）。</p></div>
+      <div class="card"><b>循環提醒</b><p class="note">WFE 2026 +16~24%、2027 減速至 +9~11%。悲觀情境內建一個 2028 循環下行年，避免線性外推。</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 期望值與部位 ===== -->
+  <section id="ev">
+    <h2><span class="n">7</span>機率加權期望值與部位 sizing（2028）</h2>
+    <div class="grid g2">
+      <div class="card" style="padding:0">
+        <div class="table-wrap" style="border:none">
+          <table style="min-width:0">
+            <thead><tr><th>情境</th><th class="num">目標</th><th class="num">報酬</th><th class="num">機率</th></tr></thead>
+            <tbody>
+              <tr><td class="up">樂觀</td><td class="num">620</td><td class="num up">+96%</td><td class="num">30%</td></tr>
+              <tr><td class="muted">中性</td><td class="num">435</td><td class="num up">+38%</td><td class="num">50%</td></tr>
+              <tr><td class="down">悲觀</td><td class="num">240</td><td class="num down">-24%</td><td class="num">20%</td></tr>
+              <tr style="font-weight:800"><td>期望值</td><td class="num">≈452</td><td class="num up">≈+43%</td><td class="num">100%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note" style="padding:0 16px 14px">橫跨約 2.5 年（至 2028 底），年化約 15%，未計股利（股利約 3.5–4%／年再墊高）。</p>
+      </div>
+      <div class="card">
+        <b>機率敏感度（EV 穩健度）</b>
+        <div class="table-wrap" style="border:none;margin-top:8px">
+          <table style="min-width:0">
+            <thead><tr><th>機率(樂/中/悲)</th><th class="num">EV 目標</th><th class="num">EV 報酬</th></tr></thead>
+            <tbody>
+              <tr><td>30/50/20</td><td class="num">452</td><td class="num up">+43%</td></tr>
+              <tr><td>25/45/30</td><td class="num">423</td><td class="num up">+34%</td></tr>
+              <tr><td>20/45/35</td><td class="num">404</td><td class="num up">+28%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">即使明顯偏空，EV 仍穩在 +28% 以上——樂觀 +96% 的賠率壓過悲觀 -24%（payoff 約 4:1）。</p>
+      </div>
+    </div>
+    <div class="callout key"><p>🔎 <b>反推現價隱含機率</b>：即使給樂觀 0% 權重，光「中性 50%＋悲觀 50%」的 EV 也有 337（高於現價 316）。要讓 EV=316，需把悲觀拉到約 60%、樂觀 0%。<b>現價已內含相當悲觀的定價（不給雙擊任何 credit）</b>——這正是反向布局的賠率來源。但此結論完全依賴 435／240 兩個遠期目標成立。</p></div>
+    <div class="callout"><p>📐 <b>Sizing 含義</b>：Kelly 以基準機率算出比例高於 100%（叫你加槓桿）——對單一變數下注＋客戶集中的循環股，這是「輸入太脆弱」的危險訊號。<b>正解：用集中度與模型風險封頂，不用 Kelly。</b>下檔可承受（-24%／含息 -15%）支持核心部位，但封在「略高於一般單檔權重」，並分批綁催化劑（現價或回 300–306 建 1/2 → 2Q26-3Q26 毛利率守 23.5% 加 1/4 → 4Q26-1Q27 泰國損平確認加 1/4）。</p></div>
+  </section>
+
+  <!-- ===== 財務 ===== -->
+  <section id="financials">
+    <h2><span class="n">8</span>財務數據趨勢</h2>
+    <p class="lead">中信投顧模型（偏樂觀端）。其他券商 2026 EPS 較低：元大 22.94／玉山 23.05／富邦 24.30。勿視為共識。</p>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>項目（百萬元）</th><th class="num">2023A</th><th class="num">2024A</th><th class="num">2025</th><th class="num">2026F</th><th class="num">2027F</th></tr></thead>
+        <tbody>
+          <tr><td>營業收入</td><td class="num">13,051</td><td class="num">16,454</td><td class="num">20,842</td><td class="num">24,902</td><td class="num">28,753</td></tr>
+          <tr><td>毛利率</td><td class="num">26.2%</td><td class="num">26.1%</td><td class="num">25.2%</td><td class="num down">24.5%</td><td class="num">25.2%</td></tr>
+          <tr><td>營益率</td><td class="num">15.6%</td><td class="num">16.2%</td><td class="num">14.9%</td><td class="num down">13.7%</td><td class="num">14.6%</td></tr>
+          <tr><td>稅後淨利</td><td class="num">1,990</td><td class="num">2,613</td><td class="num">2,336</td><td class="num">2,704</td><td class="num">3,305</td></tr>
+          <tr><td>EPS (元)</td><td class="num">20.48</td><td class="num">24.28</td><td class="num">21.24</td><td class="num">24.42</td><td class="num">29.84</td></tr>
+          <tr><td>ROE</td><td class="num">17.8%</td><td class="num">19.5%</td><td class="num">14.7%</td><td class="num">15.7%</td><td class="num">17.7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">注意毛利率 26%→24% 下滑、淨利率 15.9%→10.5% 跌更快（泰國折舊＋低毛利檢測整機代工＋稅率）——這是評價打不開的核心。1Q26 產品組成：設備代工 87%（+6%QoQ）、維修 11%（+151%YoY，併富蘭登）、自研 2%；檢測代工年增 180%、佔比升至 12%。</p>
+  </section>
+
+  <!-- ===== 技術面 ===== -->
+  <section id="technical">
+    <h2><span class="n">9</span>技術面</h2>
+    <div class="grid g2">
+      <div class="card">
+        <b>均線叢集收斂 · 待變盤</b>
+        <p class="note">MA60(季線)約 306、MA36 約 311、MA20 約 315、MA10 約 312。四線收斂於 306–315 窄區，股價貼附上緣——糾結待變盤，<b>非</b>強勢多頭噴出。原報告「季線 295／黃金交叉」已過時。</p>
+      </div>
+      <div class="card">
+        <b>利多出盡訊號</b>
+        <p class="note">6 月初衝高約 347 → 單月急殺至約 293（-15%）→ 反彈 326.5 → <b>06/17 在四家同步上修下反量增下殺約 3% 至 316</b>。回檔過程紅(跌)量放大，帶分布疑慮。</p>
+      </div>
+    </div>
+    <div class="card">
+      <b>關鍵價位</b>
+      <p class="note" style="margin-top:8px">
+        壓力：<span class="up">326.5（剛跌破，須帶量收復）→ 347（波段高）</span><br>
+        支撐：<span class="down">均線叢集 306–315 → 300 → 6 月低 293 → 結構低 280 → 前低 263.8</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== 風險 ===== -->
+  <section id="risks">
+    <h2><span class="n">10</span>風險評分卡</h2>
+    <div class="grid g2">
+      <div class="card"><b>客戶集中風險 <span class="stars">★★★★★</span></b><p class="note">AMAT 佔營收約 8 成，若砍單／自製將帶來毀滅性打擊。永久性折價來源。</p></div>
+      <div class="card"><b>財務與毛利率風險 <span class="stars">★★★★</span>☆</b><p class="note">新廠折舊高、檢測整機代工稀釋、稅率上升；毛利率回彈受人員學習曲線制約。</p></div>
+      <div class="card"><b>估值風險 <span class="stars">★★★</span>☆☆</b><p class="note">目標價皆建於 forward 基準，若 2027 放量／毛利率回升不如預期，forward 評價回壓。</p></div>
+      <div class="card"><b>產業循環風險 <span class="stars">★★</span>☆☆☆</b><p class="note">處景氣上升段，但 WFE 已減速（2027 +9~11%）；2028 循環下行為遠期主要變數。</p></div>
+    </div>
+    <div class="callout"><p><b>監控清單</b>：① 2Q26 毛利率守住 23.5%？ ② 泰國春武里 3Q26 量產如期？ ③ 合約負債 2Q26 續增？ ④ 千張大戶占比止跌回補（高於 38%）？</p>
+    <p style="margin-top:8px"><b>催化劑日曆</b>：8 月中旬 2Q26 財報＋7 月營收 · 9 月 春武里量產評測 · 11 月中旬 3Q26 財報（泰國新廠投產首季損益）。</p></div>
+  </section>
+
+  <!-- ===== 券商彙整 ===== -->
+  <section id="brokers">
+    <h2><span class="n">11</span>券商報告彙整（11 份）</h2>
+    <p class="lead">正向評等 90.9%（買進 9＋增加持股 1；中立 1）。</p>
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead><tr><th>日期</th><th>券商</th><th>評等</th><th class="num">目標價</th><th class="num">2026 EPS</th><th class="num">2027 EPS</th></tr></thead>
+        <tbody>
+          <tr><td>2026/06/17</td><td>中信</td><td><span class="pill buy">買進</span></td><td class="num">420</td><td class="num">24.42</td><td class="num">29.84</td></tr>
+          <tr><td>2026/06/17</td><td>富邦</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td class="num">24.30</td><td class="num">29.94</td></tr>
+          <tr><td>2026/06/17</td><td>元大</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td class="num">22.94</td><td class="num">26.13</td></tr>
+          <tr><td>2026/06/17</td><td>玉山</td><td><span class="pill ow">增加持股</span></td><td class="num">370</td><td class="num">23.05</td><td class="num">26.59</td></tr>
+          <tr><td>2026/03/27</td><td>元大</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td class="num">28.31</td><td class="num">—</td></tr>
+          <tr><td>2026/03/27</td><td>永豐</td><td><span class="pill buy">買進</span></td><td class="num">361</td><td class="num">22.21</td><td class="num">—</td></tr>
+          <tr><td>2025/12/24</td><td>中信</td><td><span class="pill buy">買進</span></td><td class="num">380</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>2025/12/23</td><td>富邦</td><td><span class="pill neu">中立</span></td><td class="num">330</td><td class="num">29.34</td><td class="num">33.76</td></tr>
+          <tr><td>2025/12/23</td><td>元大</td><td><span class="pill buy">買進</span></td><td class="num">350</td><td class="num">23.34</td><td class="num">26.65</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">市場 2026 EPS 半年內系統性下修約 15–20%（元大 28.31→22.94；富邦 29.34→24.30），反映新廠成本與稅率衝擊。</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>京鼎 (3413) 深度研究報告</b> · 資料截至 2026/06/17 · 現價基準 NT$316.0（TWSE MIS）</div>
+    <div class="disc">本報告由既有深度研究筆記彙整呈現，僅供研究與教育用途，不構成任何買賣要約或投資建議。所有預估與情境推演（尤其 2028–2030 遠期）為低信度假設，實際結果可能重大偏離。投資人應自行評估並承擔風險。價格與券商引用基準存在差異：走勢圖收盤 321.0、券商引用 06/16 收盤 326.5。</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // active nav highlight via IntersectionObserver
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.bar a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var sections = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  if('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          var a = map[e.target.id];
+          if(a){ a.classList.add('active');
+            // keep active chip in view on mobile
+            a.scrollIntoView({inline:'center',block:'nearest'});
+          }
+        }
+      });
+    },{rootMargin:'-45% 0px -50% 0px',threshold:0});
+    sections.forEach(function(s){ obs.observe(s); });
+  }
+})();
+</script>
+
+</body>
+</html>
