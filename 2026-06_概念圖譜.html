@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 850px;
+                 background-color: #0f0f1a;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+    <div style="position:fixed; top:10px; left:10px; background:rgba(15,15,26,0.9);
+                padding:15px; border-radius:8px; color:#e0e0e0; font-size:13px;
+                font-family: 'Microsoft JhengHei', sans-serif; z-index:9999;
+                border: 1px solid rgba(255,255,255,0.1);">
+        <b style="font-size:15px;">🕸️ 2026-06 概念圖譜</b><br><br>
+        <span style="color:#ffd700;">●</span> <b>金色邊框</b> = God Node（樞紐概念）<br>
+        <span style="color:#ff6b6b;">━</span> <b>紅色連線</b> = Surprising Connection（意外連結）<br>
+        <span style="color:rgba(150,150,150,0.6);">━</span> 灰色連線 = 一般共現<br><br>
+        節點大小 = 出現頻率<br>
+        節點顏色 = 自動分群社群<br><br>
+        <small>筆記數: 542 tags</small>
+    </div>
+    
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"borderWidth": 4, "color": {"background": "#e74c3c", "border": "#ffd700", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u6295\u8cc7\u5fc3\u7406\u5b78", "label": "\u6295\u8cc7\u5fc3\u7406\u5b78", "shape": "dot", "size": 28, "title": "\u003cb\u003e\u6295\u8cc7\u5fc3\u7406\u5b78\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 7 \u6b21\u003cbr\u003e\u793e\u7fa4: \u6295\u8cc7\u5fc3\u7406\u5b78"}, {"borderWidth": 4, "color": {"background": "#1abc9c", "border": "#ffd700", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u8cc7\u7522\u914d\u7f6e", "label": "\u8cc7\u7522\u914d\u7f6e", "shape": "dot", "size": 24, "title": "\u003cb\u003e\u8cc7\u7522\u914d\u7f6e\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 6 \u6b21\u003cbr\u003e\u793e\u7fa4: \u8cc7\u7522\u914d\u7f6e"}, {"borderWidth": 4, "color": {"background": "#3498db", "border": "#ffd700", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "Anthropic", "label": "Anthropic", "shape": "dot", "size": 24, "title": "\u003cb\u003eAnthropic\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 6 \u6b21\u003cbr\u003e\u793e\u7fa4: Anthropic"}, {"borderWidth": 4, "color": {"background": "#f39c12", "border": "#ffd700", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u53f0\u7a4d\u96fb", "label": "\u53f0\u7a4d\u96fb", "shape": "dot", "size": 20, "title": "\u003cb\u003e\u53f0\u7a4d\u96fb\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 5 \u6b21\u003cbr\u003e\u793e\u7fa4: \u53f0\u7a4d\u96fb"}, {"borderWidth": 4, "color": {"background": "#34495e", "border": "#ffd700", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u98a8\u96aa\u7ba1\u7406", "label": "\u98a8\u96aa\u7ba1\u7406", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u98a8\u96aa\u7ba1\u7406\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 3 \u6b21\u003cbr\u003e\u793e\u7fa4: \u98a8\u96aa\u7ba1\u7406"}, {"borderWidth": 1, "color": {"background": "#2ecc71", "border": "#2ecc71", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u500b\u4eba\u54c1\u724c", "label": "\u500b\u4eba\u54c1\u724c", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u500b\u4eba\u54c1\u724c\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 3 \u6b21\u003cbr\u003e\u793e\u7fa4: \u500b\u4eba\u54c1\u724c"}, {"borderWidth": 1, "color": {"background": "#f39c12", "border": "#f39c12", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5148\u9032\u5c01\u88dd", "label": "\u5148\u9032\u5c01\u88dd", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5148\u9032\u5c01\u88dd\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 3 \u6b21\u003cbr\u003e\u793e\u7fa4: \u53f0\u7a4d\u96fb"}, {"borderWidth": 1, "color": {"background": "#1abc9c", "border": "#1abc9c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u69d3\u687fETF", "label": "\u69d3\u687fETF", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u69d3\u687fETF\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 3 \u6b21\u003cbr\u003e\u793e\u7fa4: \u8cc7\u7522\u914d\u7f6e"}, {"borderWidth": 1, "color": {"background": "#e91e63", "border": "#e91e63", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5730\u7de3\u653f\u6cbb", "label": "\u5730\u7de3\u653f\u6cbb", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5730\u7de3\u653f\u6cbb\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 3 \u6b21\u003cbr\u003e\u793e\u7fa4: \u5730\u7de3\u653f\u6cbb"}, {"borderWidth": 1, "color": {"background": "#00bcd4", "border": "#00bcd4", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u69d3\u687f\u6295\u8cc7", "label": "\u69d3\u687f\u6295\u8cc7", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u69d3\u687f\u6295\u8cc7\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u69d3\u687f\u6295\u8cc7"}, {"borderWidth": 1, "color": {"background": "#2ecc71", "border": "#2ecc71", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u793e\u7fa4\u7d93\u71df", "label": "\u793e\u7fa4\u7d93\u71df", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u793e\u7fa4\u7d93\u71df\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u500b\u4eba\u54c1\u724c"}, {"borderWidth": 1, "color": {"background": "#e74c3c", "border": "#e74c3c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5149\u901a\u8a0a", "label": "\u5149\u901a\u8a0a", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5149\u901a\u8a0a\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u5149\u901a\u8a0a"}, {"borderWidth": 1, "color": {"background": "#9b59b6", "border": "#9b59b6", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u53f0\u6d3e", "label": "\u53f0\u6d3e", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u53f0\u6d3e\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u53f0\u6d3e"}, {"borderWidth": 1, "color": {"background": "#9b59b6", "border": "#9b59b6", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u793e\u6703\u89c0\u5bdf", "label": "\u793e\u6703\u89c0\u5bdf", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u793e\u6703\u89c0\u5bdf\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u53f0\u6d3e"}, {"borderWidth": 1, "color": {"background": "#3498db", "border": "#3498db", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u4eba\u5de5\u667a\u6167", "label": "\u4eba\u5de5\u667a\u6167", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u4eba\u5de5\u667a\u6167\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u4eba\u5de5\u667a\u6167"}, {"borderWidth": 1, "color": {"background": "#3498db", "border": "#3498db", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u7522\u54c1\u958b\u767c", "label": "\u7522\u54c1\u958b\u767c", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u7522\u54c1\u958b\u767c\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: Anthropic"}, {"borderWidth": 1, "color": {"background": "#3498db", "border": "#3498db", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "Claude Code", "label": "Claude Code", "shape": "dot", "size": 12, "title": "\u003cb\u003eClaude Code\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: Anthropic"}, {"borderWidth": 1, "color": {"background": "#2ecc71", "border": "#2ecc71", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "AI Agent", "label": "AI Agent", "shape": "dot", "size": 12, "title": "\u003cb\u003eAI Agent\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: AI Agent"}, {"borderWidth": 1, "color": {"background": "#f39c12", "border": "#f39c12", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u4eba\u6a5f\u5354\u4f5c", "label": "\u4eba\u6a5f\u5354\u4f5c", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u4eba\u6a5f\u5354\u4f5c\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u4eba\u6a5f\u5354\u4f5c"}, {"borderWidth": 1, "color": {"background": "#9b59b6", "border": "#9b59b6", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "AI\u6642\u4ee3", "label": "AI\u6642\u4ee3", "shape": "dot", "size": 12, "title": "\u003cb\u003eAI\u6642\u4ee3\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: AI\u6642\u4ee3"}, {"borderWidth": 1, "color": {"background": "#1abc9c", "border": "#1abc9c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "AI\u4f3a\u670d\u5668", "label": "AI\u4f3a\u670d\u5668", "shape": "dot", "size": 12, "title": "\u003cb\u003eAI\u4f3a\u670d\u5668\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: AI\u4f3a\u670d\u5668"}, {"borderWidth": 1, "color": {"background": "#e67e22", "border": "#e67e22", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "Nvidia", "label": "Nvidia", "shape": "dot", "size": 12, "title": "\u003cb\u003eNvidia\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: Nvidia"}, {"borderWidth": 1, "color": {"background": "#34495e", "border": "#34495e", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "AI \u5354\u4f5c", "label": "AI \u5354\u4f5c", "shape": "dot", "size": 12, "title": "\u003cb\u003eAI \u5354\u4f5c\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: AI \u5354\u4f5c"}, {"borderWidth": 1, "color": {"background": "#e91e63", "border": "#e91e63", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u53f0\u80a1\u6295\u8cc7", "label": "\u53f0\u80a1\u6295\u8cc7", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u53f0\u80a1\u6295\u8cc7\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u53f0\u80a1\u6295\u8cc7"}, {"borderWidth": 1, "color": {"background": "#e67e22", "border": "#e67e22", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5916\u9001\u5c08\u6cd5", "label": "\u5916\u9001\u5c08\u6cd5", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5916\u9001\u5c08\u6cd5\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u5916\u9001\u5c08\u6cd5"}, {"borderWidth": 1, "color": {"background": "#e67e22", "border": "#e67e22", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u52de\u52d5\u6b0a\u76ca", "label": "\u52de\u52d5\u6b0a\u76ca", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u52de\u52d5\u6b0a\u76ca\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u5916\u9001\u5c08\u6cd5"}, {"borderWidth": 1, "color": {"background": "#00bcd4", "border": "#00bcd4", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u9ec3\u570b\u660c", "label": "\u9ec3\u570b\u660c", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u9ec3\u570b\u660c\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u9ec3\u570b\u660c"}, {"borderWidth": 1, "color": {"background": "#e74c3c", "border": "#e74c3c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "SpaceX", "label": "SpaceX", "shape": "dot", "size": 12, "title": "\u003cb\u003eSpaceX\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: SpaceX"}, {"borderWidth": 1, "color": {"background": "#2ecc71", "border": "#2ecc71", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u793e\u7fa4\u884c\u92b7", "label": "\u793e\u7fa4\u884c\u92b7", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u793e\u7fa4\u884c\u92b7\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u500b\u4eba\u54c1\u724c"}, {"borderWidth": 1, "color": {"background": "#3498db", "border": "#3498db", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "HBM", "label": "HBM", "shape": "dot", "size": 12, "title": "\u003cb\u003eHBM\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: HBM"}, {"borderWidth": 1, "color": {"background": "#2ecc71", "border": "#2ecc71", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u77e5\u8b58\u7ba1\u7406", "label": "\u77e5\u8b58\u7ba1\u7406", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u77e5\u8b58\u7ba1\u7406\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u77e5\u8b58\u7ba1\u7406"}, {"borderWidth": 1, "color": {"background": "#e74c3c", "border": "#e74c3c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u55ae\u7b46\u6295\u8cc7", "label": "\u55ae\u7b46\u6295\u8cc7", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u55ae\u7b46\u6295\u8cc7\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u6295\u8cc7\u5fc3\u7406\u5b78"}, {"borderWidth": 1, "color": {"background": "#f39c12", "border": "#f39c12", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u8cc7\u91d1\u914d\u7f6e", "label": "\u8cc7\u91d1\u914d\u7f6e", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u8cc7\u91d1\u914d\u7f6e\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u8cc7\u91d1\u914d\u7f6e"}, {"borderWidth": 1, "color": {"background": "#e74c3c", "border": "#e74c3c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5b9a\u671f\u5b9a\u984d", "label": "\u5b9a\u671f\u5b9a\u984d", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5b9a\u671f\u5b9a\u984d\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u6295\u8cc7\u5fc3\u7406\u5b78"}, {"borderWidth": 1, "color": {"background": "#e74c3c", "border": "#e74c3c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u640d\u5931\u53ad\u60e1", "label": "\u640d\u5931\u53ad\u60e1", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u640d\u5931\u53ad\u60e1\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u6295\u8cc7\u5fc3\u7406\u5b78"}, {"borderWidth": 1, "color": {"background": "#9b59b6", "border": "#9b59b6", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u5730\u65b9\u653f\u6cbb", "label": "\u5730\u65b9\u653f\u6cbb", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u5730\u65b9\u653f\u6cbb\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u5730\u65b9\u653f\u6cbb"}, {"borderWidth": 1, "color": {"background": "#1abc9c", "border": "#1abc9c", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u9078\u64c7\u6b0a", "label": "\u9078\u64c7\u6b0a", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u9078\u64c7\u6b0a\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u9078\u64c7\u6b0a"}, {"borderWidth": 1, "color": {"background": "#e67e22", "border": "#e67e22", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u7522\u696d\u5faa\u74b0", "label": "\u7522\u696d\u5faa\u74b0", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u7522\u696d\u5faa\u74b0\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u7522\u696d\u5faa\u74b0"}, {"borderWidth": 1, "color": {"background": "#34495e", "border": "#34495e", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "DRAM", "label": "DRAM", "shape": "dot", "size": 12, "title": "\u003cb\u003eDRAM\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: DRAM"}, {"borderWidth": 1, "color": {"background": "#e91e63", "border": "#e91e63", "highlight": {"background": "#ffd700", "border": "#ffd700"}}, "font": {"color": "#e0e0e0"}, "id": "\u7f8e\u80a1\u8ca1\u5831", "label": "\u7f8e\u80a1\u8ca1\u5831", "shape": "dot", "size": 12, "title": "\u003cb\u003e\u7f8e\u80a1\u8ca1\u5831\u003c/b\u003e\u003cbr\u003e\u51fa\u73fe 2 \u6b21\u003cbr\u003e\u793e\u7fa4: \u7f8e\u80a1\u8ca1\u5831"}]);
+                  edges = new vis.DataSet([{"color": "#ff6b6b", "dashes": false, "from": "\u500b\u4eba\u54c1\u724c", "title": "\u500b\u4eba\u54c1\u724c \u2194 \u793e\u7fa4\u7d93\u71df\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.102\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u793e\u7fa4\u7d93\u71df", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u5148\u9032\u5c01\u88dd", "title": "\u5148\u9032\u5c01\u88dd \u2194 \u53f0\u7a4d\u96fb\u003cbr\u003e\u5171\u73fe 3 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=4.365\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u53f0\u7a4d\u96fb", "value": 2.4000000000000004}, {"color": "#ff6b6b", "dashes": false, "from": "\u53f0\u6d3e", "title": "\u53f0\u6d3e \u2194 \u793e\u6703\u89c0\u5bdf\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.687\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u793e\u6703\u89c0\u5bdf", "value": 1.6}, {"color": "rgba(150,150,150,0.3)", "dashes": false, "from": "\u6295\u8cc7\u5fc3\u7406\u5b78", "title": "\u6295\u8cc7\u5fc3\u7406\u5b78 \u2194 \u8cc7\u7522\u914d\u7f6e\u003cbr\u003e\u5171\u73fe 2 \u6b21", "to": "\u8cc7\u7522\u914d\u7f6e", "value": 1.6}, {"color": "rgba(150,150,150,0.3)", "dashes": false, "from": "\u69d3\u687fETF", "title": "\u69d3\u687fETF \u2194 \u8cc7\u7522\u914d\u7f6e\u003cbr\u003e\u5171\u73fe 2 \u6b21", "to": "\u8cc7\u7522\u914d\u7f6e", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "Anthropic", "title": "Anthropic \u2194 Claude Code\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=4.102\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "Claude Code", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "Anthropic", "title": "Anthropic \u2194 \u7522\u54c1\u958b\u767c\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=4.102\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u7522\u54c1\u958b\u767c", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u52de\u52d5\u6b0a\u76ca", "title": "\u52de\u52d5\u6b0a\u76ca \u2194 \u5916\u9001\u5c08\u6cd5\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.687\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u5916\u9001\u5c08\u6cd5", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u500b\u4eba\u54c1\u724c", "title": "\u500b\u4eba\u54c1\u724c \u2194 \u793e\u7fa4\u884c\u92b7\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.102\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u793e\u7fa4\u884c\u92b7", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u55ae\u7b46\u6295\u8cc7", "title": "\u55ae\u7b46\u6295\u8cc7 \u2194 \u5b9a\u671f\u5b9a\u984d\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.687\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u5b9a\u671f\u5b9a\u984d", "value": 1.6}, {"color": "rgba(150,150,150,0.3)", "dashes": false, "from": "\u55ae\u7b46\u6295\u8cc7", "title": "\u55ae\u7b46\u6295\u8cc7 \u2194 \u6295\u8cc7\u5fc3\u7406\u5b78\u003cbr\u003e\u5171\u73fe 2 \u6b21", "to": "\u6295\u8cc7\u5fc3\u7406\u5b78", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u55ae\u7b46\u6295\u8cc7", "title": "\u55ae\u7b46\u6295\u8cc7 \u2194 \u640d\u5931\u53ad\u60e1\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.687\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u640d\u5931\u53ad\u60e1", "value": 1.6}, {"color": "rgba(150,150,150,0.3)", "dashes": false, "from": "\u5b9a\u671f\u5b9a\u984d", "title": "\u5b9a\u671f\u5b9a\u984d \u2194 \u6295\u8cc7\u5fc3\u7406\u5b78\u003cbr\u003e\u5171\u73fe 2 \u6b21", "to": "\u6295\u8cc7\u5fc3\u7406\u5b78", "value": 1.6}, {"color": "#ff6b6b", "dashes": false, "from": "\u5b9a\u671f\u5b9a\u984d", "title": "\u5b9a\u671f\u5b9a\u984d \u2194 \u640d\u5931\u53ad\u60e1\u003cbr\u003e\u5171\u73fe 2 \u6b21\u003cbr\u003e\ud83d\udfe1 PMI=5.687\uff08\u610f\u5916\u9023\u7d50\uff09", "to": "\u640d\u5931\u53ad\u60e1", "value": 1.6}, {"color": "rgba(150,150,150,0.3)", "dashes": false, "from": "\u6295\u8cc7\u5fc3\u7406\u5b78", "title": "\u6295\u8cc7\u5fc3\u7406\u5b78 \u2194 \u640d\u5931\u53ad\u60e1\u003cbr\u003e\u5171\u73fe 2 \u6b21", "to": "\u640d\u5931\u53ad\u60e1", "value": 1.6}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"forceAtlas2Based": {"gravitationalConstant": -80, "centralGravity": 0.008, "springLength": 150, "springConstant": 0.05}, "solver": "forceAtlas2Based", "stabilization": {"iterations": 200}}, "interaction": {"hover": true, "tooltipDelay": 100, "navigationButtons": true}, "nodes": {"font": {"size": 14, "face": "MicrosoftJhengHei,NotoSansTC,sans-serif"}}, "edges": {"color": {"inherit": "both"}, "smooth": {"type": "continuous"}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
